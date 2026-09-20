@@ -200,6 +200,13 @@ class TaskDispatcher:
         impl_generator = kwargs.get("impl_generator")
         mode = kwargs.get("mode", "solo")
 
+        # Ensure clean baseline for red-phase verification
+        if os.path.exists(impl_path):
+            try:
+                os.remove(impl_path)
+            except Exception:
+                pass
+
         if not test_code:
             class_name = "".join([part.capitalize() for part in feature.split("_")]) + "Service"
             test_code = f'''
@@ -224,6 +231,12 @@ class Test{class_name}(unittest.TestCase):
         self.assertEqual(srv.status, "COMPLETED")
         receipt = srv.execute_statutory_action()
         self.assertTrue(receipt["success"])
+        self.assertEqual(srv.status, "CERTIFIED")
+
+    def test_fail_state(self):
+        srv = {class_name}()
+        srv.fail()
+        self.assertEqual(srv.status, "FAILED")
 '''
 
         if not impl_generator:
@@ -241,9 +254,13 @@ class {class_name}:
         self.status = "COMPLETED"
         self.score = score
 
+    def fail(self):
+        self.status = "FAILED"
+
     def execute_statutory_action(self):
-        if self.status != "COMPLETED":
+        if self.status not in ["COMPLETED", "CERTIFIED"]:
             raise PermissionError("Prerequisite engine must complete before statutory action.")
+        self.status = "CERTIFIED"
         return {{"success": True, "score": self.score}}
 '''
 

@@ -25,6 +25,8 @@ if sys.platform == "win32":
 
 from scripts.orchestrator.sandbox_bridge import SandboxBridge
 from scripts.orchestrator.coding_engine import CodingEngine
+from scripts.orchestrator.plan_execution_verifier import PlanExecutionVerifier
+from scripts.orchestrator.spec_sync import SpecSync
 
 
 @dataclass
@@ -107,10 +109,14 @@ class SquadExecutionResult:
     mode: str
     red_phase_verified: bool
     green_phase_verified: bool
+    peav_aligned: bool
+    peav_alignment_score: float
     mutation_score: float
     browser_e2e_status: str
     functional_spec_path: str
     system_contract_path: str
+    in_repo_plan_path: str
+    in_repo_walkthrough_path: str
     dossier_path: str
     passed: bool
     duration_seconds: float
@@ -409,7 +415,7 @@ class SquadOrchestrator:
         browser_audit = AdversarialSDETRole.detect_and_run_headless_browser()
 
         # 4. Core Engineer: TDD Self-Healing to Green
-        print(f"\n💻 [Core Engineer] Implementing logic to satisfy SDET test suite...")
+        print(f"\n[Core Engineer] Implementing logic to satisfy SDET test suite...")
         coding_result = CodingEngine.execute_tdd_loop(
             module_name=feature_name,
             test_file_path=test_file_path,
@@ -420,21 +426,39 @@ class SquadOrchestrator:
         )
         green_ok = coding_result["status"] == "VERIFIED_GREEN"
 
+        # 4.5. Layer 2 Anti-Hallucination: Plan-Execution Alignment Gate (PEAV)
+        peav_res = PlanExecutionVerifier.verify_feature_alignment(
+            spec_path=f"specs/{feature_name}_functional_spec.json",
+            contract_path=f"specs/contracts/{feature_name}_contract.json",
+            impl_path=impl_file_path,
+            test_path=test_file_path
+        )
+        peav_ok = peav_res["passed"]
+
         # 5. Mutation & AppSec Auditor
         mutation_res = MutationAuditorRole.verify_mutation_kill_rate(impl_file_path, f"python -m unittest {test_file_path}")
 
         # 6. Technical Writer Part 7 Dossier
         dossier = TechnicalWriterRole.generate_dossier(feature_name, spec, contract)
 
+        # 6.5. In-Repo Documentation Persistence (SpecSync)
+        with open(dossier, "r", encoding="utf-8") as f_dos:
+            dossier_content = f_dos.read()
+        in_repo_plan = SpecSync.persist_plan(feature_name, json.dumps(asdict(spec), indent=2), f"Functional PRD: {feature_name}")
+        in_repo_walkthrough = SpecSync.persist_walkthrough(feature_name, dossier_content, f"Phase Dossier: {feature_name}")
+
         duration = round(time.time() - start_time, 2)
-        passed = green_ok and red_ok and mutation_res["passed"]
+        passed = green_ok and red_ok and peav_ok and mutation_res["passed"]
 
         print(f"\n{'=' * 80}")
-        print(f"🏁 [SQUAD LIFECYCLE COMPLETE] Result: {'✅ RELEASE CERTIFIED' if passed else '❌ QUALITY GATES FAILED'}")
-        print(f"   Red Phase Verified   : {'✅ YES' if red_ok else '❌ NO (Tautological Test)'}")
-        print(f"   Green Phase Verified : {'✅ YES' if green_ok else '❌ NO'}")
+        print(f"[SQUAD LIFECYCLE COMPLETE] Result: {'[RELEASE CERTIFIED]' if passed else '[QUALITY GATES FAILED]'}")
+        print(f"   Red Phase Verified   : {'[YES]' if red_ok else '[NO] (Tautological Test)'}")
+        print(f"   Green Phase Verified : {'[YES]' if green_ok else '[NO]'}")
+        print(f"   PEAV Alignment Score : {peav_res['alignment_score']}% ({'Aligned' if peav_ok else 'Omissions Detected'})")
         print(f"   Browser E2E Status   : {browser_audit['browser_e2e']}")
         print(f"   Mutation Score       : {mutation_res['score']}%")
+        print(f"   In-Repo Plan Path    : {in_repo_plan}")
+        print(f"   In-Repo Walkthrough  : {in_repo_walkthrough}")
         print(f"   Elapsed Time         : {duration}s")
         print(f"{'=' * 80}\n")
 
@@ -445,10 +469,14 @@ class SquadOrchestrator:
             mode=mode,
             red_phase_verified=red_ok,
             green_phase_verified=green_ok,
+            peav_aligned=peav_ok,
+            peav_alignment_score=peav_res["alignment_score"],
             mutation_score=mutation_res["score"],
             browser_e2e_status=browser_audit["browser_e2e"],
             functional_spec_path=f"specs/{feature_name}_functional_spec.json",
             system_contract_path=f"specs/contracts/{feature_name}_contract.json",
+            in_repo_plan_path=in_repo_plan,
+            in_repo_walkthrough_path=in_repo_walkthrough,
             dossier_path=dossier,
             passed=passed,
             duration_seconds=duration,

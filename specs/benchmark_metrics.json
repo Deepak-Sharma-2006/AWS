@@ -5,8 +5,8 @@
   ],
   "test_file": "specs/scratch_tests/test_audit_probe.py",
   "healing_iterations_needed": 1,
-  "execution_duration_sec": 0.071,
+  "execution_duration_sec": 0.096,
   "sandbox_mode": "process_jail",
   "status": "VERIFIED_GREEN",
-  "timestamp": "2026-09-21T00:48:48Z"
+  "timestamp": "2026-09-21T01:09:30Z"
 }
