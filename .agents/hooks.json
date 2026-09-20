@@ -1,0 +1,42 @@
+{
+  "safety-gate": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/anti-hallucination-checker.js --pre-check",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
+  "anti-hallucination-verifier": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/anti-hallucination-checker.js --scan-imports",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
+  "token-budget-tracker": {
+    "enabled": true,
+    "PostInvocation": [
+      {
+        "type": "command",
+        "command": "node scripts/token-budget-guard.js --record",
+        "timeout": 10
+      }
+    ]
+  }
+}

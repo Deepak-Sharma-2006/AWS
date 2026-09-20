@@ -1,0 +1,13 @@
+{
+  "module": "multi_file_calculator",
+  "patched_files": [
+    "specs/scratch_tests/calculator.py",
+    "specs/scratch_tests/formatter.py"
+  ],
+  "test_file": "specs/scratch_tests/test_multifile_calc.py",
+  "healing_iterations_needed": 2,
+  "execution_duration_sec": 0.342,
+  "sandbox_mode": "process_jail",
+  "status": "VERIFIED_GREEN",
+  "timestamp": "2026-09-21T00:02:43Z"
+}

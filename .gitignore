@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment and secrets
+.env
+.env.local
+*.pem
+
+# Build artifacts and caches
+dist/
+build/
+.npm-cache/
+prisma/*.db
+prisma/*.db-wal
+prisma/*.db-shm
+
+# Ephemeral runtime logs
+.agents/state/active-role.local.json
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Operator working notes & scratchpads
+scripts_transcripts*
+How to Read Code*
+
+# Specs generated presentation decks, rendered slide images, and scratch test artifacts
+specs/presentations/deck_*
+specs/presentations/test_*
+specs/presentations/rendered/
+specs/presentations/extracted/
+specs/scratch_tests/
+specs/test_assets/
+specs/*.pptx
+specs/*.pdf
+specs/presentations/*.pptx
+specs/presentations/*.pdf
+
+
+

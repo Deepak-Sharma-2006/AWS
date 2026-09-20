@@ -1,0 +1,14 @@
+{
+  "phase": "phase-1",
+  "totalTokensUsed": 0,
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "estimatedCostUsd": 0,
+  "lastUpdated": "2026-09-08T10:33:46.630Z",
+  "isBreached": false,
+  "modelId": "gemini-2.0-flash",
+  "contextSaturationPercent": 0,
+  "activeDirectives": [
+    "🟢 Context Optimal: Normal execution. Maintain progressive disclosure for skill lookups."
+  ]
+}
