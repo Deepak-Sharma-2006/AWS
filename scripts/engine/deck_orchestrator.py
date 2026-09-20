@@ -81,6 +81,15 @@ class DeckOrchestrator:
 
         prs.save(output_pptx_path)
         print(f"[DeckOrchestrator] Successfully compiled PPTX (Stage 1): {output_pptx_path}")
+
+        # Compile companion HTML presentation with Canva-grade CSS, Google Fonts, and vector styling
+        html_out = output_pptx_path.rsplit('.', 1)[0] + ".html"
+        try:
+            from scripts.engine.html_deck_compiler import HTMLDeckCompiler
+            HTMLDeckCompiler.compile_html(plan, html_out)
+        except Exception as e:
+            print(f"[DeckOrchestrator] Note: HTML companion compile skipped: {e}")
+
         return output_pptx_path
 
     @classmethod

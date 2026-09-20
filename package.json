@@ -58,6 +58,7 @@
     "token:set-model": "node --experimental-strip-types scripts/token-budget-guard.ts set-model",
     "token:record": "node --experimental-strip-types scripts/token-budget-guard.ts record",
     "harness:eval": "node --experimental-strip-types .agents/harness/eval-runner.ts",
+    "audit:trail": "node --experimental-strip-types scripts/audit-trail-verifier.ts",
     "readiness": "node --experimental-strip-types scripts/system-readiness.ts",
     "readiness:check": "node --experimental-strip-types scripts/system-readiness.ts",
     "skill:list": "node --experimental-strip-types scripts/skill-finder.ts list",
