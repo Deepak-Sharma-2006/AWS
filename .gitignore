@@ -22,6 +22,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.log
+*.bak
 
 # Operator working notes & scratchpads
 scripts_transcripts*
@@ -36,8 +37,8 @@ specs/scratch_tests/
 specs/test_assets/
 specs/*.pptx
 specs/*.pdf
-specs/presentations/*.pptx
-specs/presentations/*.pdf
-
+specs/*.html
+!specs/presentations/BHEDAK_SIH2026.pptx
+!specs/presentations/CHAKRA_SIH2026.pptx
 
 

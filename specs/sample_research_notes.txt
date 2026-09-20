@@ -1,8 +1,0 @@
-=== RESEARCH NOTES: DISTRIBUTED THREAT INTELLIGENCE ===
-"Autonomous Cross-Border Forensic Analytics and Graph Deanonymization" (Tippe & Tippe, 2024).
-"Stylometric Profiling for Multi-Platform Cybercrime Attribution" (Shin et al., 2025).
-
-Core Technologies:
-- Backend: FastAPI, Python 3.12, Docker, Kafka Streams
-- ML & Forensics: PyTorch, Vector DB, Neo4j
-- Recon: Censys, Shodan, Wireshark, Next.js 15, STIX 2.1
