@@ -106,10 +106,10 @@ Answer these five questions to establish your baseline topology:
 
 #### Topology 1: Single Agent Workflow (Bounded Loop)
 - **Control Topology**: 1 agent owns perception, planning, and execution within one loop.
-- **Execution Flow**: Emergent iteration ($Prompt \rightarrow Tool \rightarrow Critic \rightarrow Exit$).
+- **Execution Flow**: Emergent iteration (Prompt → Tool → Critic → Exit).
 - **Best For**: Bug fixes, single component styling, refactoring a single file.
 - **Main Risk**: Drift, hallucination loops, runaway token spend.
-- **Standard Setup**: 1 Agent + Strict Zod-validated Tools + Max Iteration Stop Limit ($N=5$).
+- **Standard Setup**: 1 Agent + Strict Zod-validated Tools + Max Iteration Stop Limit (N = 5).
 
 #### Topology 2: Hierarchical Multi-Agent Workflow (Supervisor & Workers)
 - **Control Topology**: Supervisor holds high-level state; delegates to specialized subagents.
@@ -120,7 +120,7 @@ Answer these five questions to establish your baseline topology:
 
 #### Topology 3: Sequential Pipeline Workflow (Assembly Line)
 - **Control Topology**: Deterministic chain of specialized steps with typed input/output contracts.
-- **Execution Flow**: Step A $\rightarrow$ Step B $\rightarrow$ Step C $\rightarrow$ Step D.
+- **Execution Flow**: Step A → Step B → Step C → Step D.
 - **Best For**: CI/CD pipelines, automated dependency audits, onboarding flows.
 - **Main Risk**: Brittleness on edge cases.
 - **Standard Setup**: Typed pipeline steps + runtime validator + human escalation fallback lane.
@@ -1539,7 +1539,7 @@ Every generated `phase_XX_comprehension_dossier.md` must adhere to this strict s
   - *Verification*: Both return identical error payload: `{"error": "Invalid credentials"}` with HTTP 401.
 - **Timing Discrepancy Defense**:
   - *Vulnerability*: If user is not found, does the code skip `bcrypt.compare`, executing in 2ms vs 120ms?
-  - *Implementation Audit*: `AuthService.ts#L55` executes a dummy hash verification (`bcrypt.compare(dummyHash)`) when user is not found to equalize response times ($\Delta t < 5\text{ms}$).
+  - *Implementation Audit*: `AuthService.ts#L55` executes a dummy hash verification (`bcrypt.compare(dummyHash)`) when user is not found to equalize response times (Δt < 5 ms).
 
 ## 8. Function-by-Function 1-Sentence Atomic Compressions (Technique 6)
 - `AuthController.login`: Parses incoming JSON, invokes auth service, and wraps result into secure cookie response.
@@ -1626,9 +1626,9 @@ Here is a complete, production-grade example generated for the authentication ph
   - Attempting non-existent email returns: `{"error": "Invalid username or password"}` (HTTP 401).
   - Attempting invalid password returns: `{"error": "Invalid username or password"}` (HTTP 401).
 - **Timing Leakage Audit**:
-  - Non-existent user response duration: **$124.2\text{ms}$**.
-  - Incorrect password response duration: **$122.8\text{ms}$**.
-  - Difference ($\Delta t$): **$1.4\text{ms}$** (Within acceptable jitter band; prevents timing attacks).
+  - Non-existent user response duration: **124.2 ms**.
+  - Incorrect password response duration: **122.8 ms**.
+  - Difference (Δt): **1.4 ms** (Within acceptable jitter band; prevents timing attacks).
 
 ## 8. Function-by-Function 1-Sentence Atomic Compressions
 - `handleLoginRequest`: Validates incoming payload schema, invokes verifier, and sets session cookie.
@@ -2342,7 +2342,7 @@ Both workstations combine **Antigravity IDE** and **Antigravity CLI (`agy`)** to
 
 ---
 
-### 10.3 Dynamic Role Inversion (Symmetrical Alpha $\leftrightarrow$ Beta Rotation)
+### 10.3 Dynamic Role Inversion (Symmetrical Alpha ↔ Beta Rotation)
 
 To ensure **100% equal contribution** across the development team and eliminate author bias, the two engineers alternate between two core operational roles on a per-phase basis:
 
@@ -2365,7 +2365,7 @@ To ensure **100% equal contribution** across the development team and eliminate 
 ##### 1. The ALPHA Role (Primary Builder)
 - **Step 1: Domain Lease Acquisition**: Alpha runs `npx ts-node scripts/lock-manager.ts acquire --domain <name> --operator <MyNode> --role Alpha --ttl 3600`.
 - **Step 2: Architecture & ADR**: Alpha drafts the Architecture Decision Record and creates deterministic TDD unit tests (`*.test.ts`).
-- **Step 3: Autonomous Coding Loop**: Alpha invokes Antigravity IDE (Planning Mode $\rightarrow$ Agent Mode) to implement the feature logic in accordance with strict TypeScript rules.
+- **Step 3: Autonomous Coding Loop**: Alpha invokes Antigravity IDE (Planning Mode → Agent Mode) to implement the feature logic in accordance with strict TypeScript rules.
 - **Step 4: Phase 7 Comprehension Dossier**: Alpha generates `docs/dossiers/phase-<X>-<domain>.md` incorporating all 6 cognitive techniques.
 - **Step 5: Hand-Off Event**: Alpha commits to `feat/phase-X`, pushes to origin, and transfers the domain lease to Beta.
 
@@ -2373,7 +2373,7 @@ To ensure **100% equal contribution** across the development team and eliminate 
 - **Step 1: Receive Lease**: Beta receives the domain lease via `scripts/lock-manager.ts transfer`.
 - **Step 2: The Claude Council Swarm**: Beta runs `scripts/council.ts` on the PR diff to uncover sycophancy, edge cases, and architectural flaws.
 - **Step 3: Styx Autonomous AI Red-Team DAST**: Beta spins up the live container sandbox and executes `npx ts-node scripts/pen-test-runner.ts`. If any critical or high exploit is verified with Proof-of-Exploit (PoE), the PR is automatically rejected.
-- **Step 4: Cognitive Comprehension Audit**: Beta reads the Phase Dossier, verifies that failure paths have constant-time verification ($\Delta t < 1\text{ms}$), checks against account enumeration, and executes the 1-Sentence Feynman Compression Test.
+- **Step 4: Cognitive Comprehension Audit**: Beta reads the Phase Dossier, verifies that failure paths have constant-time verification (Δt < 1 ms), checks against account enumeration, and executes the 1-Sentence Feynman Compression Test.
 - **Step 5: Merge Sign-Off & Role Flip**: Once all gates pass, Beta merges `feat/phase-X` into `main`, and the roles invert for the next phase.
 
 ---
@@ -2744,7 +2744,129 @@ Pitch presentations compiled via OmniDeck support native vector UI mockups:
 - `mobile_mockup`: Smartphone frame with dynamic island notch, title bar, and prioritized alert cards.
 - `quadrant_matrix`: 2x2 Gartner-style competitive positioning matrix with highlighted 10x White-Space Moat leader badge.
 
+---
 
+### 11.9 Universal In-Repo Living Documentation Architecture (The 6 Classes)
 
+A primary failure mode in modern agentic engineering is the **Orphaned Context Trap**: critical architectural trade-offs, research findings, and audit discoveries are emitted exclusively into ephemeral chat windows, vanishing as soon as the session closes or context compacts.
 
+To eliminate this vulnerability, the platform mandates the **6 In-Repo Version-Controlled Document Classes**. Every generated technical artifact is written directly to disk under `docs/` and tracked in living, human-navigable `INDEX.md` catalogs maintained by the `SpecSync` engine (`scripts/orchestrator/spec_sync.py`).
 
+```
+                              ┌─────────────────────────────┐
+                              │    SPECSYNC UNIFIED ENGINE  │
+                              └──────────────┬──────────────┘
+                                             │
+      ┌─────────────────┬────────────────────┼───────────────────┬─────────────────┐
+      ▼                 ▼                    ▼                   ▼                 ▼
+┌───────────┐     ┌───────────┐        ┌───────────┐       ┌───────────┐     ┌───────────┐
+│docs/plans/│     │docs/walk- │        │docs/      │       │docs/adrs/ │     │docs/      │
+│           │     │throughs/  │        │audits/    │       │           │     │research/  │
+│Living PRDs│     │Execution  │        │Readiness  │       │Arch Trade-│     │Statutory  │
+│& Roadmaps │     │Test Proofs│        │& Pentests │       │offs & Moat│     │& Compet.  │
+└─────┬─────┘     └─────┬─────┘        └─────┬─────┘       └─────┬─────┘     └─────┬─────┘
+      │                 │                    │                   │                 │
+      └─────────────────┴────────────────────┼───────────────────┴─────────────────┘
+                                             ▼
+                              ┌─────────────────────────────┐
+                              │  DUAL-PERSISTENCE VAULT     │
+                              │  • SQLite FTS5 Database     │
+                              │  • Plain-Text JSONL Log     │
+                              └─────────────────────────────┘
+```
+
+#### The 6 In-Repo Document Classes
+1. **Implementation Plans (`docs/plans/` -> `docs/plans/INDEX.md`)**:
+   - Stores feature PRDs, architecture specifications, user-approved milestones, and verification plans.
+   - Automatically generated at the start of complex tasks or via `--task solution`.
+2. **Execution Walkthroughs (`docs/walkthroughs/` -> `docs/walkthroughs/INDEX.md`)**:
+   - Stores end-of-turn execution dossiers, code diffs, and empirical test proofs.
+   - Replaces conversational "I did this" summaries with permanent git-versioned proof.
+3. **System Audits (`docs/audits/` -> `docs/audits/INDEX.md`)**:
+   - Stores 6-pillar system readiness reports, adversarial penetration tests (Strix/DAST), and legacy remediation dossiers.
+4. **Architecture Decision Records (`docs/adrs/` -> `docs/adrs/INDEX.md`)**:
+   - Preserves non-negotiable architectural trade-offs, tech stack selections, cryptographic invariants, and the 10x White-Space Moat.
+5. **Deep Research Dossiers (`docs/research/` -> `docs/research/INDEX.md`)**:
+   - Stores multi-hop triangulation findings: statutory compliance mandates (e.g. BSA Section 63, HIPAA, GDPR), live competitor benchmarks, and CVE failure paths.
+6. **Formal RFCs & Contract Schemas (`docs/rfcs/` -> `docs/rfcs/INDEX.md`)**:
+   - Tracks inter-service API schemas, event contracts, state machine transitions, and database models across project phases.
+
+---
+
+### 11.10 Deterministic AST Mutation Testing (Python & TypeScript)
+
+Unit test suites that pass 100% can still be completely tautological (asserting `true === true` or testing empty functions). To guarantee that tests actively detect and fail on real bugs, the platform enforces the **Mutation Testing Engine** across both Python and TypeScript with a strict ≥ 80% mutant kill rate acceptance gate.
+
+```
+       SOURCE CODE                                                    TEST SUITE
+┌───────────────────────┐                                      ┌───────────────────────┐
+│ def calculate_fee(x): │                                      │ def test_fee():       │
+│     if x > 100:       │                                      │     assert fee(150)>0 │
+│         return x * 0.1│                                      └───────────┬───────────┘
+└──────────┬────────────┘                                                  │
+           │                                                               │
+           ▼                                                               │
+┌────────────────────────────────────────────────────────┐                 │
+│                 AST MUTATION INJECTOR                  │                 │
+│ 1. Boundary Inversion: `x > 100`  ──> `x <= 100`       │                 │
+│ 2. Boolean Flip:       `True`     ──> `False`          │                 │
+│ 3. Arithmetic Flip:    `x * 0.1`  ──> `x / 0.1`        │                 │
+│ 4. Return Override:    `return x` ──> `return None`    │                 │
+└──────────────────────────┬─────────────────────────────┘                 │
+                           │                                               │
+                           ▼                                               │
+            [ RUN TESTS AGAINST EACH MUTANT ] <────────────────────────────┘
+                           │
+             ┌─────────────┴─────────────┐
+             ▼                           ▼
+        [ MUTANT KILLED ]           [ MUTANT SURVIVED ]
+        (Test failed = GOOD)        (Test passed = DEFECT!)
+             │                           │
+             └─────────────┬─────────────┘
+                           ▼
+          KILL RATE = Killed / Total Mutants
+          Acceptance Gate: Kill Rate >= 80.0%
+```
+
+#### Safety & Transactional Rollback
+- **Atomic `.bak` Backup**: Before any AST mutation is applied to a file, an exact `.bak` snapshot is written to disk.
+- **Signal Handlers (`SIGINT`, `SIGTERM`, `atexit`)**: If the test runner is aborted, interrupted, or crashes, signal handlers unconditionally restore the original source file from `.bak`, preventing uncommitted mutations from poisoning the working tree.
+- **CLI Execution**:
+  ```bash
+  # Python AST Mutation Testing
+  python -m scripts.orchestrator.python_mutation_tester src/hydraulics.py "python -m unittest tests/test_hydraulics.py"
+
+  # TypeScript AST Mutation Testing
+  npm run test:mutation
+  ```
+
+---
+
+### 11.11 Fail-Closed Headless Playwright Verification & Component Shell Standard
+
+In web applications, visual drift and broken UI layouts often slip past unit tests. The platform enforces automated headless browser verification via Playwright whenever frontend files are detected.
+
+#### 1. Fail-Closed Verification Gate
+- If frontend files (`.html`, `.tsx`, `.jsx`, `.vue`) exist in the feature directory, the Adversarial SDET **mandates** active browser test execution.
+- If Playwright tests do not exist or fail, the squad run is immediately rejected (`FAILED_PLAYWRIGHT_MISSING`) with exit code `1`.
+- **Scoped Directory Detection**: Prevents pure backend features from being falsely blocked by unrelated frontend templates in the repository root.
+
+#### 2. The Enterprise Frontend Component Shell Standard (Directive 14)
+All user interfaces must strictly adhere to the 3-tier component shell:
+1. `<header class="app-header">`: Global navigation, breadcrumbs, search, and environment status.
+2. `<main class="app-viewport">`: Dynamic responsive content area, dashboard grids, or data visualization stages.
+3. `<footer class="app-action-dock">`: **Fixed bottom-right anchor** for all workflow triggers, evidence exports, and approval buttons. Workflow buttons must never be nested inside scrollable table cards or random corners.
+
+---
+
+### 11.12 Dual-Persistence Memory Vault Architecture
+
+In a distributed 2-person / 2-computer setup, committing binary SQLite files (`.agents/memory/vault.sqlite`) directly to Git creates irreconcilable binary merge conflicts.
+
+The platform resolves this by implementing **Dual-Persistence Synchronization**:
+1. **Plain-Text Append-Only JSONL (`.agents/memory/vault/records.jsonl`)**:
+   - Human-readable and fully mergeable via standard Git pull/rebase across workstations.
+   - Contains immutable records of all ADRs, research dossiers, and phase handoffs.
+2. **Local SQLite FTS5 Database (`.agents/memory/vault.sqlite`)**:
+   - Automatically regenerated and indexed from the JSONL log on startup.
+   - Provides sub-millisecond BM25 full-text search across all historical architectural decisions.

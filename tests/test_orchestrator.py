@@ -65,7 +65,7 @@ class TestEnterpriseOrchestrator(unittest.TestCase):
         """Verifies SolutionCouncil formulates solution, renders visuals, and records to Memory Vault."""
         out_dir = "docs/dossiers/test_council"
         res = SolutionCouncil.formulate_solution(
-            problem_title="ORBITAL-EARLY-WARN-2026: Satellite Fire Early Warning",
+            problem_title="SIH-2026: Satellite Fire Early Warning",
             problem_text="High altitude thermal imaging for forest wildfire triage.",
             domain="Clean Energy & Space",
             output_dir=out_dir

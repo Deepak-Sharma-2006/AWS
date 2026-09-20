@@ -48,11 +48,9 @@ class TestEnginePhase5(unittest.TestCase):
             self.assertEqual(report_sih.total_margin_violations, 0)
 
     def test_chat_research_parser_ingestion(self):
-        """Tests parsing technical research dump."""
-        chat_path = "specs/sample_research_notes.txt"
-        if not os.path.exists(chat_path):
-            chat_path = "specs/extracted_gemini_chat.txt"
-        self.assertTrue(os.path.exists(chat_path), "Research text must exist")
+        """Tests parsing real-world technical chat dump (specs/extracted_gemini_chat.txt)."""
+        chat_path = "specs/extracted_gemini_chat.txt"
+        self.assertTrue(os.path.exists(chat_path), "extracted_gemini_chat.txt must exist")
 
         spec = ChatResearchParser.parse_file(chat_path)
         self.assertIn("team_name", spec)
@@ -65,17 +63,15 @@ class TestEnginePhase5(unittest.TestCase):
 
     def test_end_to_end_research_to_championship_deck(self):
         """
-        Ingests research text, synthesizes a 6-slide deck,
+        Ingests real-world research from extracted_gemini_chat.txt, synthesizes a 6-slide deck,
         runs the closed-loop auto-corrector, and verifies 0 defects via Vision QA Gate.
         """
-        chat_path = "specs/sample_research_notes.txt"
-        if not os.path.exists(chat_path):
-            chat_path = "specs/extracted_gemini_chat.txt"
+        chat_path = "specs/extracted_gemini_chat.txt"
         spec = ChatResearchParser.parse_file(chat_path, fallback_spec={
-            "team_name": "AEROSEC",
-            "team_subtitle": "(Autonomous Threat Intelligence)",
-            "problem_id": "CYBER-DEFENSE-01",
-            "problem_title": "Enterprise Threat Actor De-Anonymization & Attribution",
+            "team_name": "BHEDAK",
+            "team_subtitle": "(भेदक)",
+            "problem_id": "SIH2026-NTRO-DW-02",
+            "problem_title": "Dark Web Threat Actor De-Anonymization & Attribution",
             "solution_title": "Autonomous Forensic Intelligence & Cross-Platform Linkage Pipeline"
         })
 

@@ -6,7 +6,7 @@
  * Mandate: Mutation Score >= 80% required for production release.
  */
 
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 import { fileURLToPath } from "node:url";
@@ -73,6 +73,35 @@ export function runMutationTest(
   }
 
   const originalContent = readFileSync(fullPath, "utf-8");
+  const backupPath = `${fullPath}.bak`;
+  writeFileSync(backupPath, originalContent, "utf-8");
+
+  const restoreOriginal = () => {
+    try {
+      if (existsSync(backupPath)) {
+        writeFileSync(fullPath, originalContent, "utf-8");
+        unlinkSync(backupPath);
+      }
+    } catch {
+      // Ignore cleanup error
+    }
+  };
+
+  const onSignal = () => {
+    restoreOriginal();
+    process.exit(1);
+  };
+
+  const onException = (err: any) => {
+    restoreOriginal();
+    console.error("Mutation runner exception:", err);
+    process.exit(1);
+  };
+
+  process.on("SIGINT", onSignal);
+  process.on("SIGTERM", onSignal);
+  process.on("uncaughtException", onException);
+
   const results: MutationResult[] = [];
 
   try {
@@ -167,8 +196,10 @@ export function runMutationTest(
       results
     };
   } finally {
-    // ALWAYS restore pristine original content
-    writeFileSync(fullPath, originalContent, "utf-8");
+    restoreOriginal();
+    process.removeListener("SIGINT", onSignal);
+    process.removeListener("SIGTERM", onSignal);
+    process.removeListener("uncaughtException", onException);
   }
 }
 

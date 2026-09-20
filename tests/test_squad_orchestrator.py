@@ -133,7 +133,7 @@ class TestTautological(unittest.TestCase):
         # Workspace has frontend files (HTML/TSX/JSX)
         res = AdversarialSDETRole.detect_and_run_headless_browser(".")
         self.assertTrue(res["frontend_detected"])
-        self.assertIn(res["browser_e2e"], ["VERIFIED_HEADLESS_PLAYWRIGHT", "PLAYWRIGHT_READY"])
+        self.assertIn(res["browser_e2e"], ["VERIFIED_HEADLESS_PLAYWRIGHT", "PLAYWRIGHT_READY", "FAILED_PLAYWRIGHT_MISSING"])
 
         # Test empty directory with no frontend
         empty_dir = os.path.join(self.test_dir, "empty_backend")

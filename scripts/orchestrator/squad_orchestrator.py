@@ -194,6 +194,37 @@ class SystemArchitectRole:
         with open(contract_file, "w", encoding="utf-8") as f:
             json.dump(asdict(contract), f, indent=2)
 
+        # Persist formal RFC & contract schema into docs/rfcs/
+        rfc_content = f"""# RFC: {spec.feature_name.upper()} Contract Specification
+
+> **Scope**: `{spec.feature_name}` | **Persona**: `System Architect` | **Type**: `Formal Contract & FSM Schema`
+
+---
+
+## 1. Finite State Machine (FSM) States
+{', '.join([f'`{s}`' for s in contract.fsm_states])}
+
+### Transitions:
+| Source State | Target State | Trigger Event |
+| :--- | :--- | :--- |
+""" + "\n".join([f"| `{t['from']}` | `{t['to']}` | `{t['trigger']}` |" for t in contract.fsm_transitions]) + f"""
+
+---
+
+## 2. Typed Data Schemas
+```json
+{json.dumps(contract.data_schemas, indent=2)}
+```
+
+---
+
+## 3. API Contract Endpoints
+| HTTP Method | Path | Response Type |
+| :--- | :--- | :--- |
+""" + "\n".join([f"| `{e['method']}` | `{e['path']}` | `{e['response']}` |" for e in contract.api_endpoints]) + "\n"
+
+        SpecSync.persist_rfc(spec.feature_name, rfc_content, f"RFC: {spec.feature_name} System Contract")
+
         print(f"🏛️ [System Architect] Typed interface contract & FSM emitted: {contract_file}")
         return contract
 
@@ -269,12 +300,20 @@ class AdversarialSDETRole:
                 pass
 
         if not playwright_cmd:
-            # Fallback probe to npx playwright --version or headless browser execution check
-            playwright_cmd = ["npx", "--yes", "playwright", "--version"]
+            has_e2e_dir = os.path.exists(os.path.join(target_dir, "e2e")) or os.path.exists(os.path.join(target_dir, "tests", "e2e"))
+            if has_e2e_dir:
+                playwright_cmd = ["npx", "playwright", "test"]
+            else:
+                playwright_cmd = ["npx", "--yes", "playwright", "--version"]
 
         res = SandboxBridge.execute(playwright_cmd, timeout_seconds=30)
         browser_passed = res.returncode == 0
-        status_str = "VERIFIED_HEADLESS_PLAYWRIGHT" if browser_passed else "PLAYWRIGHT_READY"
+        if "test" in " ".join(playwright_cmd) and browser_passed:
+            status_str = "VERIFIED_HEADLESS_PLAYWRIGHT"
+        elif browser_passed:
+            status_str = "PLAYWRIGHT_READY"
+        else:
+            status_str = "FAILED_PLAYWRIGHT_MISSING"
 
         print(f"🌐 [Adversarial SDET] Browser Verification Result: {status_str} (Code: {res.returncode})")
         return {
@@ -282,7 +321,8 @@ class AdversarialSDETRole:
             "browser_e2e": status_str,
             "command": " ".join(playwright_cmd),
             "exit_code": res.returncode,
-            "sample_frontend_files": frontend_files[:3]
+            "sample_frontend_files": frontend_files[:3],
+            "passed": browser_passed
         }
 
 
@@ -298,9 +338,24 @@ class MutationAuditorRole:
             res = SandboxBridge.execute(cmd, timeout_seconds=45)
             passed = res.returncode == 0
             return {"passed": passed, "score": 80.0 if passed else 40.0}
-        
-        # Python target fallback baseline
-        return {"passed": True, "score": 90.0}
+
+        # Python target: Run native AST mutation engine
+        if target_file.endswith(".py"):
+            from scripts.orchestrator.python_mutation_tester import PythonMutationEngine
+            try:
+                engine = PythonMutationEngine(target_file, test_cmd, threshold=threshold)
+                res = engine.run()
+                return {
+                    "passed": res["passed"],
+                    "score": res["score"],
+                    "total": res.get("total", 0),
+                    "killed": res.get("killed", 0)
+                }
+            except Exception as e:
+                print(f"⚠️ [Mutation Auditor] Python AST mutation tester error: {e}")
+                return {"passed": False, "score": 0.0, "error": str(e)}
+
+        return {"passed": True, "score": 100.0}
 
 
 class TechnicalWriterRole:
@@ -412,7 +467,8 @@ class SquadOrchestrator:
 
         # 3. Adversarial SDET: Red Phase Test & Headless Browser Verification
         red_ok = AdversarialSDETRole.verify_red_phase(test_file_path, test_code)
-        browser_audit = AdversarialSDETRole.detect_and_run_headless_browser()
+        feature_dir = os.path.dirname(os.path.abspath(impl_file_path)) if impl_file_path else "."
+        browser_audit = AdversarialSDETRole.detect_and_run_headless_browser(feature_dir)
 
         # 4. Core Engineer: TDD Self-Healing to Green
         print(f"\n[Core Engineer] Implementing logic to satisfy SDET test suite...")
@@ -447,8 +503,12 @@ class SquadOrchestrator:
         in_repo_plan = SpecSync.persist_plan(feature_name, json.dumps(asdict(spec), indent=2), f"Functional PRD: {feature_name}")
         in_repo_walkthrough = SpecSync.persist_walkthrough(feature_name, dossier_content, f"Phase Dossier: {feature_name}")
 
+        browser_ok = True
+        if browser_audit.get("frontend_detected") and browser_audit.get("browser_e2e") in ("FAILED_PLAYWRIGHT_MISSING", "FAILED_PLAYWRIGHT_EXECUTION"):
+            browser_ok = False
+
         duration = round(time.time() - start_time, 2)
-        passed = green_ok and red_ok and peav_ok and mutation_res["passed"]
+        passed = green_ok and red_ok and peav_ok and mutation_res["passed"] and browser_ok
 
         print(f"\n{'=' * 80}")
         print(f"[SQUAD LIFECYCLE COMPLETE] Result: {'[RELEASE CERTIFIED]' if passed else '[QUALITY GATES FAILED]'}")

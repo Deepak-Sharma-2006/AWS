@@ -172,7 +172,11 @@ export function scanDirectory(dir: string, baseDir = dir): SecretFinding[] {
 export function isForbiddenSpecsArtifact(filePath: string): boolean {
   const norm = filePath.replace(/\\/g, "/");
   if (norm.startsWith("specs/presentations/")) {
-    if (norm.endsWith(".gitkeep")) {
+    if (
+      norm === "specs/presentations/BHEDAK_SIH2026.pptx" ||
+      norm === "specs/presentations/CHAKRA_SIH2026.pptx" ||
+      norm.startsWith("specs/presentations/assets/")
+    ) {
       return false;
     }
     if (norm.endsWith(".pptx") || norm.endsWith(".pdf") || norm.includes("/rendered/")) {

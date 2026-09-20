@@ -86,15 +86,15 @@ class PromptDeconstructor:
 
         if not problem_points:
             problem_points = [
-                "Legacy manual inspection creates operational bottlenecks and multi-hour delays",
-                "Fragmented data silos prevent unified cross-source correlation and intelligence",
-                "High false-positive alarm rates drain investigation resources and cause alert fatigue"
+                f"Manual operational workflows in {title} create severe turnaround bottlenecks and delay triage",
+                f"Fragmented data silos prevent unified real-time correlation and situational awareness for {title}",
+                f"High false-positive rates drain operational resources and reduce human operator confidence"
             ]
         if not solution_points:
             solution_points = [
-                "Autonomous edge intelligence processes incoming data streams in under 50 milliseconds",
-                "Graph neural network correlates cross-domain entities into unified actionable topologies",
-                "Cryptographic tamper-evident audit logging ensures 100% regulatory and legal compliance"
+                f"Autonomous edge intelligence processes incoming {title} data streams in under 50 milliseconds",
+                f"Neural correlation engine maps cross-domain dependencies into unified actionable representations",
+                f"Deterministic tamper-evident audit logging guarantees 100% statutory and operational compliance"
             ]
 
         return {

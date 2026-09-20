@@ -18,17 +18,10 @@ class TestEnginePhase6C(unittest.TestCase):
     """Unit tests for Phase 6C cognitive analysis, dynamic planning, and two-stage workflow."""
 
     def test_cognitive_analyzer_on_existing_deck(self):
-        """Verifies CognitiveDeckAnalyzer extracts design grammar from reference presentation."""
-        ref_pptx = "specs/presentations/sample_reference_deck.pptx"
+        """Verifies CognitiveDeckAnalyzer extracts design grammar from existing presentation."""
+        ref_pptx = "specs/presentations/BHEDAK_SIH2026.pptx"
         if not os.path.exists(ref_pptx):
-            prompt = """
-            # CYBERSHIELD: Autonomous Cloud Threat Intelligence
-            Problem: Multi-cloud breaches bypass perimeter security in hybrid environments.
-            Solution: Distributed zero-trust eBPF telemetry isolates lateral movement in real-time.
-            """
-            plan = OmniDeckPlanner.plan_from_prompt(prompt, theme_name="cyber_dark_terminal", num_slides=3)
-            os.makedirs("specs/presentations", exist_ok=True)
-            DeckOrchestrator.compile_pptx(plan, ref_pptx)
+            ref_pptx = "specs/presentations/deck_cyber_dark_agent.pptx"
 
         grammar = CognitiveDeckAnalyzer.analyze_pptx(ref_pptx)
         self.assertIsNotNone(grammar.primary_bg)
