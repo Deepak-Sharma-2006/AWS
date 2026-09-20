@@ -47,7 +47,7 @@ export function createServer(config: ServerConfig = defaultConfig): Server {
     }
 
     // Security Shield: Reject path traversal / injection attacks
-    if (url.includes("..") || url.includes("<") || url.includes("%00") || /passwd|win\.ini|system32/i.test(url)) {
+    if (url.includes("..") || url.includes("<") || url.toLowerCase().includes("%3c") || url.includes("%00") || /passwd|win\.ini|system32/i.test(url)) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Bad Request: Invalid path syntax" }));
       return;

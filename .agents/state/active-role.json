@@ -1,7 +1,9 @@
 {
-  "operator": "Computer1",
+  "operator": "SoloOperator",
   "role": "Alpha",
   "phase": 1,
   "activeLeaseDomain": "core",
-  "updatedAt": "2026-09-08T06:14:00.000Z"
+  "updatedAt": "2026-09-20T19:06:12.952Z",
+  "roleTitle": "Feature Architect & Core Domain Lead",
+  "mode": "solo"
 }

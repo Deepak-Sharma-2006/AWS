@@ -12,12 +12,18 @@ export interface ActiveRoleProfile {
   phase: number;
   activeLeaseDomain: string;
   updatedAt: string;
+  mode?: "solo" | "dual";
 }
 
 const STATE_DIR = join(process.cwd(), ".agents/state");
 const ROLE_FILE = join(STATE_DIR, "active-role.json");
 
-function getRoleTitle(role: "Alpha" | "Beta"): string {
+function getRoleTitle(role: "Alpha" | "Beta", mode?: "solo" | "dual"): string {
+  if (mode === "solo") {
+    return role === "Alpha"
+      ? "Solo Enterprise Lead (Autonomous Alpha Architect)"
+      : "Solo Enterprise Auditor (Autonomous Beta SDET)";
+  }
   return role === "Alpha"
     ? "Feature Architect & Core Domain Lead"
     : "Adversarial Systems, SDET & Product Lead";
@@ -103,14 +109,41 @@ export function printRoleMatrix(): void {
 ================================================================================`);
 }
 
+export function setOperatingMode(mode: "solo" | "dual"): boolean {
+  const profile = getActiveProfile();
+  profile.mode = mode;
+  if (mode === "solo") {
+    profile.operator = "SoloOperator";
+    profile.role = "Alpha";
+    profile.roleTitle = getRoleTitle("Alpha", "solo");
+    saveProfile(profile);
+    console.log(`\n🎯 [OPERATING MODE: SOLO ACTIVATED]`);
+    console.log(`   Operator Identity     : SoloOperator (Unified Chief Architect & Product Lead)`);
+    console.log(`   Autonomous Squad      : Enabled (PM, Architect, SDET, Coder, SecAuditor, TechWriter)`);
+    console.log(`   Multi-Host Lease Lock : Bypassed (Single operator maintains full system control)`);
+    console.log(`   Adversarial Gates     : Gated via autonomous Lead 2 SDET & Mutation Testing\n`);
+  } else {
+    profile.operator = resolveOperator();
+    profile.roleTitle = getRoleTitle(profile.role, "dual");
+    saveProfile(profile);
+    console.log(`\n👥 [OPERATING MODE: DUAL ACTIVATED]`);
+    console.log(`   Workstation Operator  : ${profile.operator}`);
+    console.log(`   Collaboration Model   : Enterprise 2-Person 50/50 Dual-Lead Rotation`);
+    console.log(`   Multi-Host Lease Lock : Enforced (Distributed git locks across workstations)\n`);
+  }
+  return true;
+}
+
 export function printRoleStatus(): void {
   const profile = getActiveProfile();
   const currentHost = resolveOperator();
+  const mode = profile.mode || "solo";
 
   console.log(`
 ================================================================================
                ACTIVE WORKSPACE ROLE & LEASE PROFILE
 ================================================================================
+  Operating Mode        : ${mode.toUpperCase()} (${mode === "solo" ? "Single Dev / Autonomous Squad" : "2-Person 50/50 Dual-Lead"})
   Current Workstation   : ${currentHost}
   Active Profile Leader : ${profile.operator}
   Assigned Role         : ${profile.role} (${profile.roleTitle})
@@ -291,6 +324,13 @@ if (isMain) {
 
   if (command === "status") {
     printRoleStatus();
+  } else if (command === "mode") {
+    const targetMode = (positional[0] || flags["set"] || "status").toLowerCase();
+    if (targetMode === "solo" || targetMode === "dual") {
+      setOperatingMode(targetMode);
+    } else {
+      printRoleStatus();
+    }
   } else if (command === "matrix") {
     printRoleMatrix();
   } else if (command === "alpha") {
@@ -311,6 +351,7 @@ Usage: node --experimental-strip-types scripts/role-switch.ts <command> [options
 
 Commands:
   status               Display active operator, role title, phase, and domain lease
+  mode [solo|dual]     Toggle between Solo Dev (Autonomous Squad) and Dual-Lead modes
   matrix               Display the enterprise 50/50 division of labor matrix
   alpha [domain] [op]  Acquire domain lease and set workstation as Lead 1 (Alpha)
   beta [domain] [op]   Configure workstation as Lead 2 (Beta) with Hardening Authority

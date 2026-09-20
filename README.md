@@ -12,29 +12,49 @@ An enterprise-grade, production-hardened development platform and operational ha
 
 ## ⚡ Core Architectural Pillars
 
-1. **Dynamic Role Inversion (50/50 Equality)**:
-   - Symmetrical roles alternate on a per-phase basis.
-   - **Phase 1 (Odd)**: Computer 1 = **Alpha (Builder/Author)** | Computer 2 = **Beta (Adversarial Auditor)**.
-   - **Phase 2 (Even)**: Computer 2 = **Alpha (Builder/Author)** | Computer 1 = **Beta (Adversarial Auditor)**.
-   - Eliminates author bias and ensures 100% equal development contribution.
-2. **Distributed Domain Lease Locking**:
+1. **Dual-Mode Operator Architecture (Solo vs Dual)**:
+   - **Solo Mode (`npm run mode:solo`)**: Instant solo-developer velocity. Automatically supersedes distributed lock contention while preserving subagent persona separation.
+   - **Dual Mode (`npm run mode:dual`)**: Symmetrical 50/50 dual-lead workflow alternating across Computer 1 (Alpha) and Computer 2 (Beta).
+   - Check status anytime via `npm run mode:status`.
+2. **Hierarchical Agile Product Squad (`npm run squad:run`)**:
+   - Simulates a full enterprise product team: Product Manager, System Architect, Adversarial SDET, Core Engineer, Mutation Auditor, and Technical Writer.
+   - Enforces the **Red-to-Green Test Invariant**: SDET tests must be written first and verified RED before implementation begins.
+   - Automated Headless Browser verification with Playwright whenever frontend code is detected.
+3. **Deterministic Mutation Testing Engine (`npm run test:mutation`)**:
+   - Injects AST faults (boundary flips, return overrides, arithmetic inversions, state bypasses) to ensure test suites kill $\ge 80\%$ of injected bugs. Eliminates false green tests.
+4. **Distributed Domain Lease Locking**:
    - Atomic file/domain leases in `.agents/state/locks/<domain>.lock.json` managed via `scripts/lock-manager.ts`.
-   - Prevents concurrent agent write collisions and merge conflicts.
-3. **Strict Anti-Hallucination & Supply Chain Shield**:
+5. **Strict Anti-Hallucination & Supply Chain Shield**:
    - Zero ghost packages tolerated. Automated AST scanning (`scripts/anti-hallucination-checker.ts`) against `package.json` and Node.js built-ins.
-   - Empirical proof required: Agents must physically execute tests and capture exit code `0`.
-4. **Token Economy & Hard Budget Brakes**:
-   - Progressive disclosure (skills load only lightweight metadata; manuals load on-demand).
-   - Hard limits: Max 5 iterations per auto-correction loop, 300s task timeout, and 250,000 token ceiling per phase.
-5. **Cognitive Code Comprehension Protocol (Part 7)**:
+6. **Token Economy & Hard Budget Brakes**:
+   - Progressive disclosure, max 5 iterations per auto-correction loop, and 250,000 token ceiling per phase.
+7. **Cognitive Code Comprehension Protocol (Part 7)**:
    - Mandatory 6-technique cognitive reading dossiers generated for every completed phase in `docs/dossiers/`.
-   - Beta auditor must pass the 1-Sentence Feynman Compression Test before PR sign-off.
-6. **Autonomous Dynamic Red-Team DAST (Styx)**:
+8. **Autonomous Dynamic Red-Team DAST (Styx)**:
    - Multi-agent simulated hacker mesh attacks live container sandboxes with Proof-of-Exploit (PoE) verification before code merges.
 
 ---
 
-## 🚀 Quickstart: Setup for Both Workstations
+## 🚀 Quickstart: Solo Operator Workflow
+
+```bash
+# 1. Switch to Solo Operator Mode (No distributed lock contention)
+npm run mode:solo
+npm run mode:status
+
+# 2. Run Enterprise Agile Product Squad on any feature
+python -m scripts.orchestrator.task_dispatcher --task squad --feature case_state_manager
+
+# 3. Verify Mutation Testing Kill Rate (Must kill >= 80% mutants)
+npm run test:mutation
+
+# 4. Run Next-Gen Dynamic Behavioral Evaluation Harness
+npm run harness:dynamic
+```
+
+---
+
+## 👥 Quickstart: 2-Person Dual Workstation Setup
 
 ### Prerequisites
 - **Node.js**: v20.0+ LTS (Node 24 supported with `--experimental-strip-types`)
@@ -54,10 +74,11 @@ cd script
 # 2. Install dependencies & type definitions
 npm install
 
-# 3. Verify Antigravity customization layer & scripts
+# 3. Set Dual Mode & Verify Antigravity customization layer
+npm run mode:dual
 npm run check:hallucinations   # Zero ghost packages check
 npm run role:status            # Inspect active domain leases
-npm run harness:eval           # Validate 4/4 behavioral test contracts
+npm run harness:dynamic        # Validate 5/5 next-gen dynamic test contracts
 
 # 4. Acquire Phase 1 Lease (Alpha Builder Role)
 npm run role:alpha -- auth      # Atomically leases 'auth' domain to Computer 1

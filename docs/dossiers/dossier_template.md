@@ -15,7 +15,7 @@
 
 ---
 
-## Technique 2: Visual Code Flow (Call Graph)
+## Technique 2: Visual Code Flow
 *Native Markdown call graph / sequence depicting function invocations and transitions.*
 
 ```
@@ -69,7 +69,7 @@
 
 ---
 
-## Technique 6: 1-Sentence Feynman Compression Test
+## Technique 6: 1-Sentence Feynman Mental Compression Test
 *One simple sentence explaining the mechanism such that a non-technical stakeholder immediately understands it.*
 
 > "<Summary statement in plain English>."

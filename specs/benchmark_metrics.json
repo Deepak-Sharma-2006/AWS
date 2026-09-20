@@ -1,13 +1,12 @@
 {
-  "module": "multi_file_calculator",
+  "module": "audit_probe",
   "patched_files": [
-    "specs/scratch_tests/calculator.py",
-    "specs/scratch_tests/formatter.py"
+    "specs/scratch_tests/audit_probe.py"
   ],
-  "test_file": "specs/scratch_tests/test_multifile_calc.py",
-  "healing_iterations_needed": 2,
-  "execution_duration_sec": 0.342,
+  "test_file": "specs/scratch_tests/test_audit_probe.py",
+  "healing_iterations_needed": 1,
+  "execution_duration_sec": 0.071,
   "sandbox_mode": "process_jail",
   "status": "VERIFIED_GREEN",
-  "timestamp": "2026-09-21T00:02:43Z"
+  "timestamp": "2026-09-21T00:48:48Z"
 }

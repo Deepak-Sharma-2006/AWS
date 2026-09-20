@@ -32,7 +32,25 @@ function ensureLocksDir(): void {
   }
 }
 
+const ROLE_FILE = join(process.cwd(), ".agents/state/active-role.json");
+
+export function isSoloMode(): boolean {
+  if (process.env.OPERATOR_MODE === "solo") return true;
+  if (existsSync(ROLE_FILE)) {
+    try {
+      const data = JSON.parse(readFileSync(ROLE_FILE, "utf-8"));
+      return data.mode === "solo";
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
 export function resolveOperator(explicitOperator?: string): string {
+  if (isSoloMode()) {
+    return explicitOperator?.trim() || "SoloOperator";
+  }
   if (explicitOperator && explicitOperator.trim()) {
     return explicitOperator.trim();
   }
@@ -61,15 +79,14 @@ export class LocalGitDriver implements LockDriver {
         const expiresAt = new Date(existing.expiresAt);
         const graceEnd = new Date(expiresAt.getTime() + GRACE_PERIOD_SECONDS * 1000);
 
-        // Active unexpired lease held by someone else
-        if (now < expiresAt && existing.operator !== lease.operator) {
+        // In solo mode, the solo operator seamlessly supersedes previous domain locks
+        if (isSoloMode()) {
+          // Seamless acquisition allowed in solo mode
+        } else if (now < expiresAt && existing.operator !== lease.operator) {
           console.error(`\n🚨 LOCK CONFLICT: Domain '${lease.domain}' is actively leased to '${existing.operator}' (${existing.role}) on host '${existing.host}'.`);
           console.error(`Expires at: ${existing.expiresAt}. Run 'npm run role:handoff' or wait for release.\n`);
           return false;
-        }
-
-        // In grace period
-        if (now >= expiresAt && now < graceEnd && existing.operator !== lease.operator) {
+        } else if (now >= expiresAt && now < graceEnd && existing.operator !== lease.operator) {
           console.warn(`\n⚠️ LEASE GRACE PERIOD: Domain '${lease.domain}' expired at ${existing.expiresAt} but is in a 15-minute grace window for '${existing.operator}'.`);
           console.warn(`Attempting graceful transfer to '${lease.operator}'.\n`);
         }

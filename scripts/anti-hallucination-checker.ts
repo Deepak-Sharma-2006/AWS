@@ -12,7 +12,7 @@ const NODE_BUILTINS = new Set([
   "util/types", "v8", "vm", "wasi", "worker_threads", "zlib", "test", "sqlite"
 ]);
 
-function getDeclaredDependencies(projectRoot: string): Set<string> {
+export function getDeclaredDependencies(projectRoot: string): Set<string> {
   const pkgPath = join(projectRoot, "package.json");
   const declared = new Set<string>();
 

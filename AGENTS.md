@@ -140,5 +140,52 @@
    - Every solution must achieve an explicit Council Verdict (`APPROVED WITH HARDENING`) and pass the **Contrarian 4-Moat Test** (Data Ingestion, Algorithmic, Sovereign/Statutory, and Financial Unit Economics).
    - Solutions must incorporate **Cryptographic Anti-Tamper & Enclave Isolation Specifications** (SHA-256 Merkle chain-of-custody, constant-time `timingSafeEqual` security, and fail-closed state transitions) to ensure solutions are non-reproducible by generic AI prompts and resilient against reverse-engineering.
 
+---
 
+## 11. Dual-Mode Operation (Solo Operator vs. 50/50 Dual-Lead Mode)
 
+1. **Flexible Operating Modes**:
+   - **Solo Operator Mode (`npm run mode:solo`)**: Designed for single developers building end-to-end applications. Bypasses distributed lease-lock collisions across workstations by assigning full domain ownership to the solo operator while preserving subagent persona separation.
+   - **Dual-Lead Enterprise Mode (`npm run mode:dual`)**: Enforces co-equal 50/50 division across two distinct workstations (Computer 1: Lead 1 Alpha; Computer 2: Lead 2 Beta). Mandates atomic lease handoffs (`npm run role:handoff`) and distributed lock synchronization before cross-domain edits.
+2. **Mode Status & Verification**:
+   - Query active mode at any time via `npm run mode:status`.
+   - The active mode is persisted in `.agents/state/active-role.json` and governs lease acquisition in `scripts/lock-manager.ts`.
+
+---
+
+## 12. Anti-Green Signal Trap & Red-First Testing Invariant
+
+1. **Mandatory Red-Phase Pre-Flight Verification**:
+   - Tests MUST be written FIRST by the Adversarial SDET before feature implementation begins.
+   - The test must be executed against stubs/missing code and verified **RED (Exit code $\ne 0$)**. Any test that passes immediately without business logic is classified as a **Tautological Test Defect** and rejected.
+2. **Deterministic Mutation Testing Gate ($\ge 80\%$ Kill Rate)**:
+   - All modules must be audited by the Mutation Testing Engine (`npm run test:mutation`).
+   - The engine injects 4 fault classes:
+     1. Boundary inversions (`>` to `<=`, `===` to `!==`).
+     2. Return value overrides (`return true` to `return false`, `return data` to `return null`).
+     3. Arithmetic and assignment mutations (`+` to `-`, `*` to `/`).
+     4. State bypass mutations (omitted FSM transitions or event emits).
+   - Test suites that fail to kill at least 80% of injected mutants are rejected with exit code `1`.
+3. **Automated Headless Browser Verification for Frontend**:
+   - Whenever frontend files (`.html`, `.tsx`, `.jsx`, `.vue`, `.svelte`) exist in the project, the Adversarial SDET automatically executes headless Playwright browser verification by default.
+4. **Differentiated LLM Persona Routing**:
+   - Enterprise product squads must execute using specialized reasoning profiles:
+     - **Product Manager**: Balanced reasoning (`temp=0.7`, `effort=medium`).
+     - **System Architect**: Rigorous deterministic schema contracts (`temp=0.2`, `effort=high`).
+     - **Adversarial SDET**: Creative boundary probe and edge-case fuzzing (`temp=0.8`, `effort=high`).
+     - **Core Engineer**: Deterministic idiomatic implementation (`temp=0.1`, `effort=medium`).
+     - **Mutation Auditor**: Deterministic AST fault injection (`temp=0.0`, `effort=low`).
+     - **Technical Writer**: Clear 6-technique cognitive synthesis (`temp=0.4`, `effort=low`).
+
+---
+
+## 13. Universal Centralized Reactive State Store Mandate
+
+1. **Zero Data Reset Across View Navigations**:
+   - Multi-tab and multi-view applications must store all domain state, telemetry outputs, and graph models in a single reactive, persistent store.
+   - Switching tabs, selecting sample datasets, or navigating dashboards must NEVER clear or re-initialize previously computed pipeline data.
+2. **Fail-Closed Statutory Action Gating**:
+   - Downstream actions (statutory certificates, evidence exports, dockets) are strictly gated by the central Finite State Machine (FSM).
+   - Certificates and export buttons must remain disabled until prerequisite engines transition to `COMPLETED` and computed confidence metrics meet statutory thresholds.
+3. **Strict UI Binding Invariant**:
+   - UI metrics, badges, and buttons must bind directly to live calculated outputs from the state store. Hardcoding mock scores or percentages in UI components is strictly prohibited.

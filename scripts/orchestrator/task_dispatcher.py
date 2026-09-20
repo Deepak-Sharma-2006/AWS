@@ -45,8 +45,10 @@ class TaskDispatcher:
             return cls._handle_continue(**kwargs)
         elif task_clean in ("memory", "vault", "search"):
             return cls._handle_memory(**kwargs)
+        elif task_clean in ("squad", "agile", "enterprise", "team", "lifecycle"):
+            return cls._handle_squad(**kwargs)
         else:
-            raise ValueError(f"Unknown task type '{task}'. Supported: solution, code, presentation, audit, continue, memory")
+            raise ValueError(f"Unknown task type '{task}'. Supported: solution, code, presentation, audit, continue, memory, squad")
 
     @classmethod
     def _handle_solution(cls, **kwargs) -> Dict[str, Any]:
@@ -186,11 +188,85 @@ class TaskDispatcher:
         print(f"\n[TaskDispatcher] Memory Vault Search for '{query}': Found {len(results)} records.")
         return {"query": query, "matches": results}
 
+    @classmethod
+    def _handle_squad(cls, **kwargs) -> Dict[str, Any]:
+        """Task: Enterprise Agile Product Squad Orchestrator."""
+        from scripts.orchestrator.squad_orchestrator import SquadOrchestrator
+        feature = kwargs.get("feature") or kwargs.get("module") or "enterprise_feature"
+        prompt = kwargs.get("prompt") or f"Implement production-grade {feature} with reactive state persistence and strict gating."
+        test_path = kwargs.get("test_path", f"specs/scratch_tests/test_{feature}.py")
+        impl_path = kwargs.get("impl_path", f"specs/scratch_tests/{feature}.py")
+        test_code = kwargs.get("test_code")
+        impl_generator = kwargs.get("impl_generator")
+        mode = kwargs.get("mode", "solo")
+
+        if not test_code:
+            class_name = "".join([part.capitalize() for part in feature.split("_")]) + "Service"
+            test_code = f'''
+import unittest
+from specs.scratch_tests.{feature} import {class_name}
+
+class Test{class_name}(unittest.TestCase):
+    def test_service_initialization(self):
+        srv = {class_name}()
+        self.assertEqual(srv.status, "IDLE")
+
+    def test_operation_gating(self):
+        srv = {class_name}()
+        with self.assertRaises(PermissionError):
+            srv.execute_statutory_action()
+
+    def test_complete_verified_flow(self):
+        srv = {class_name}()
+        srv.start()
+        self.assertEqual(srv.status, "RUNNING")
+        srv.complete(score=0.98)
+        self.assertEqual(srv.status, "COMPLETED")
+        receipt = srv.execute_statutory_action()
+        self.assertTrue(receipt["success"])
+'''
+
+        if not impl_generator:
+            class_name = "".join([part.capitalize() for part in feature.split("_")]) + "Service"
+            impl_generator = lambda it, err: f'''
+class {class_name}:
+    def __init__(self):
+        self.status = "IDLE"
+        self.score = 0.0
+
+    def start(self):
+        self.status = "RUNNING"
+
+    def complete(self, score: float):
+        self.status = "COMPLETED"
+        self.score = score
+
+    def execute_statutory_action(self):
+        if self.status != "COMPLETED":
+            raise PermissionError("Prerequisite engine must complete before statutory action.")
+        return {{"success": True, "score": self.score}}
+'''
+
+        print(f"\n[TaskDispatcher] Routing to Enterprise Agile Product Squad ({feature}, mode: {mode})...")
+        res = SquadOrchestrator.execute_squad_feature(
+            feature_name=feature,
+            user_prompt=prompt,
+            test_file_path=test_path,
+            test_code=test_code,
+            impl_file_path=impl_path,
+            impl_code_generator=impl_generator,
+            mode=mode
+        )
+        import dataclasses
+        return dataclasses.asdict(res)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Universal Task Dispatcher for Enterprise Agentic System")
-    parser.add_argument("--task", required=True, choices=["solution", "code", "presentation", "audit", "continue", "memory"], help="Task to execute")
+    parser.add_argument("--task", required=True, choices=["solution", "code", "presentation", "audit", "continue", "memory", "squad"], help="Task to execute")
     parser.add_argument("--target", help="Target project directory or blueprint file for audit/remediation or continuation")
+    parser.add_argument("--feature", default="case_service", help="Feature name for squad lifecycle")
+    parser.add_argument("--mode", default="solo", choices=["solo", "dual"], help="Operator mode (solo or dual)")
     parser.add_argument("--auto-heal", action="store_true", help="Automatically trigger red-to-green remediation on detected flaws")
     parser.add_argument("--output-report", default="docs/audits/remediation_audit.md", help="Path to write audit/remediation report")
     parser.add_argument("--prompt", help="Natural language prompt or problem statement")
@@ -206,6 +282,8 @@ def main():
     res = TaskDispatcher.dispatch(
         task=args.task,
         target=args.target,
+        feature=args.feature,
+        mode=args.mode,
         auto_heal=args.auto_heal,
         output_report=args.output_report,
         prompt=args.prompt,

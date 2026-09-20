@@ -1,0 +1,40 @@
+[
+  {
+    "id": "eval-01-anti-hallucination",
+    "name": "Ghost Dependency & AST Import Verification",
+    "type": "ast-validation",
+    "description": "Verifies that all AST imports in src, scripts, and tests are grounded in package.json or Node.js built-ins with zero ghost packages."
+  },
+  {
+    "id": "eval-02-role-and-mode-compliance",
+    "name": "Operator Mode & Domain Lease Verification",
+    "type": "state-validation",
+    "description": "Validates that active-role.json supports both solo and dual operating modes with unambiguous domain lease contracts."
+  },
+  {
+    "id": "eval-03-mutation-test-fidelity",
+    "name": "Anti-Green Signal Trap Mutation Gate",
+    "type": "mutation-test",
+    "description": "Verifies that the test suite kills >= 80% of deliberately injected mutants, preventing tautological and superficial tests."
+  },
+  {
+    "id": "eval-04-cognitive-comprehension-dossier",
+    "name": "Part 7 6-Technique Cognitive Dossier Mandate",
+    "type": "dossier-validation",
+    "description": "Verifies that docs/dossiers/ contains complete compliance with all 6 required cognitive comprehension techniques.",
+    "requiredSections": [
+      "Technique 1: The Human Mental Model",
+      "Technique 2: Visual Code Flow",
+      "Technique 3: Variable Lifecycle Trace",
+      "Technique 4: Non-Blocking Noise Filtering",
+      "Technique 5: Audit Exactly One Failure Path",
+      "Technique 6: 1-Sentence Feynman"
+    ]
+  },
+  {
+    "id": "eval-05-zero-secret-shield",
+    "name": "Pre-Commit Zero-Secret Invariant",
+    "type": "secret-validation",
+    "description": "Verifies that no API tokens, private keys, or credentials exist in workspace code or documentation."
+  }
+]
