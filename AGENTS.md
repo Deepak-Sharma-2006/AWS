@@ -189,3 +189,22 @@
    - Certificates and export buttons must remain disabled until prerequisite engines transition to `COMPLETED` and computed confidence metrics meet statutory thresholds.
 3. **Strict UI Binding Invariant**:
    - UI metrics, badges, and buttons must bind directly to live calculated outputs from the state store. Hardcoding mock scores or percentages in UI components is strictly prohibited.
+
+---
+
+## 14. Enterprise Frontend Component Shell & Design Token Invariant
+
+1. **Universal Component Shell Structure**:
+   - All web interfaces must adhere to a standardized 3-tier layout hierarchy:
+     - `<header class="app-header">`: Navigation, environment badges, and global search.
+     - `<main class="app-viewport">`: Dynamic tab views, analytical grids, and visualization stages.
+     - `<footer class="app-action-dock">`: Fixed bottom-right anchor for workflow directive buttons, export triggers, and pipeline actions.
+   - Placing workflow action buttons inside nested scrollable boxes, table cards, or arbitrary corners is strictly prohibited.
+2. **Mandatory Semantic Design Tokens**:
+   - UIs must import standard semantic tokens (`templates/frontend/design-tokens.css`). Ad-hoc inline styles and arbitrary hex codes are forbidden.
+   - Use standard typography scales (`--font-family-display`), spacing increments (`--space-1` to `--space-12`), and elevation shadows.
+3. **Safe DOM Re-rendering & Graph Viewport Clamping**:
+   - Dynamic card updates must clear stale contents before appending to prevent duplicate text nodes.
+   - D3/SVG graph canvas elements must clamp initial zoom scale and center coordinates prior to node injection to eliminate 1-second zoom glitching.
+4. **Headless Geometry Verification**:
+   - Playwright browser tests must assert element geometry (`getBoundingClientRect()`) to verify that buttons maintain fixed coordinates across all tab transitions.
