@@ -154,8 +154,8 @@ Implement the multi-persona enterprise software company simulation to end the "s
     3. **Arithmetic / Assignment Mutation**: `+` to `-`, `*` to `/`.
     4. **State Bypass Mutation**: Commenting out state persistence / emit calls.
   - Executes the test suite for each mutant.
-  - Calculates the **Mutation Score**: $\frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%$.
-  - Fails with exit code `1` if Mutation Score $< 80\%$, preventing false-green test suites from shipping.
+  - Calculates the **Mutation Score**: frac{Killed Mutants}{Total Mutants} × 100%.
+  - Fails with exit code `1` if Mutation Score < 80%, preventing false-green test suites from shipping.
 
 ---
 

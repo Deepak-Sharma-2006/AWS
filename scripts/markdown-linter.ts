@@ -23,7 +23,15 @@ export class MarkdownLinter {
     const violations: LintViolation[] = [];
     const ignoreDirs = new Set(['node_modules', '.git', '.venv', 'venv', 'dist', 'build', '.tempmediaStorage', '.system_generated', 'specs']);
 
+    if (fs.existsSync(dirPath) && fs.statSync(dirPath).isFile()) {
+      if (dirPath.endsWith('.md')) {
+        MarkdownLinter.lintFile(dirPath, violations);
+      }
+      return { clean: violations.length === 0, violations };
+    }
+
     function walk(current: string) {
+      if (!fs.existsSync(current)) return;
       const entries = fs.readdirSync(current, { withFileTypes: true });
       for (const entry of entries) {
         if (entry.isDirectory()) {

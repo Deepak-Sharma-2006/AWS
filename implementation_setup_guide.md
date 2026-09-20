@@ -2450,8 +2450,8 @@ Agents operating on either workstation are strictly prevented from hallucinating
 
 To prevent runaway LLM costs during autonomous loop execution, both machines enforce the 5 token controls:
 
-1. **Progressive Disclosure**: Skills inject only lightweight YAML frontmatter ($<100$ tokens) on initialization; comprehensive reference manuals are pulled strictly on demand.
-2. **Slice-Targeted File Reading**: Agents are forbidden from reading files $>150$ lines in full; they must use `grep_search` and bounded `view_file(StartLine, EndLine)`.
+1. **Progressive Disclosure**: Skills inject only lightweight YAML frontmatter (< 100 tokens) on initialization; comprehensive reference manuals are pulled strictly on demand.
+2. **Slice-Targeted File Reading**: Agents are forbidden from reading files > 150 lines in full; they must use `grep_search` and bounded `view_file(StartLine, EndLine)`.
 3. **Compacted Transcripts**: Historical context is ingested via `transcript.jsonl` rather than verbose raw logs.
 4. **Hard Execution Ceilings**:
    - **Max Correction Loops**: 5 iterations per task before forced human escalation.

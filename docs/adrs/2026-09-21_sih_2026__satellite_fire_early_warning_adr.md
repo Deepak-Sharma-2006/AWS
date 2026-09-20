@@ -11,7 +11,7 @@ High altitude thermal imaging for forest wildfire triage.
 1. **Data Ingestion Moat**: Proprietary high-frequency telemetry stream from SIH-2026: Satellite Fire Early Warning; zero dependence on third-party cloud data.
 2. **Algorithmic Moat**: Low-latency neural transformer model executing with sub-50ms inference latency, eliminating cloud API hops.
 3. **Statutory Moat**: Statutory compliance under ISO/IEC standards, immutable audit trails, and strict data sovereignty.
-4. **Economic Moat**: Optimized local execution amortizes cost down to $0.0006/query vs $0.08 commercial cloud equivalents.
+4. **Economic Moat**: Optimized local execution amortizes cost down to 0.0006/query vs0.08 commercial cloud equivalents.
 
 ## 3. Cryptographic Anti-Tamper Specification
 - **Merkle Chain**: SHA-256 parent-chained telemetry blocks signed with Ed25519; any bit alteration invalidates the tree.

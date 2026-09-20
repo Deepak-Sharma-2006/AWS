@@ -36,7 +36,7 @@
 3. **Sovereign / Statutory Moat**:
    - Statutory compliance under ISO/IEC standards, immutable audit trails, and strict data sovereignty.
 4. **Financial & Unit Economics Moat**:
-   - Optimized local execution amortizes cost down to $0.0006/query vs $0.08 commercial cloud equivalents.
+   - Optimized local execution amortizes cost down to 0.0006/query vs0.08 commercial cloud equivalents.
 
 ---
 
@@ -110,9 +110,9 @@ All metrics reflect rigorous empirical validation under peak stress-load simulat
 
 | Metric / Financial Dimension | Baseline Model (10k reqs) | Scaling Model (100k reqs) | Enterprise Model (1M reqs) |
 | :--- | :--- | :--- | :--- |
-| **Total Cost per 1,000 Queries** | **$0.3210** | **$0.3210** | **$0.3210** |
-| **Monthly Infrastructure COGS** | $43.03 | $71.92 | $360.82 |
-| **Target Subscription / Seat** | **$11.61 / mo** | **$11.61 / mo** | **Volume Tiered** |
+| **Total Cost per 1,000 Queries** | **0.3210** | **0.3210** | **$0.3210** |
+| **Monthly Infrastructure COGS** | 43.03 |71.92 | $360.82 |
+| **Target Subscription / Seat** | **11.61 / mo** | **11.61 / mo** | **Volume Tiered** |
 | **Software Gross Margin Target** | **97.2% (High Margin)**| **97.2% (Healthy)** | **> 85% (Scale Advantage)** |
 | **Unit Economics Feasibility** | **VERIFIED SUSTAINABLE** | **VERIFIED PROFITABLE** | **COMMERCIALLY DEFENSIVE** |
 

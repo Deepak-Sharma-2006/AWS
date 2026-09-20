@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11%2B%20%7C%2080%2F80%20Pass-brightgreen.svg)](https://python.org/)
 [![Antigravity](https://img.shields.io/badge/Antigravity-IDE%20%2B%20CLI-purple.svg)](https://antigravity.google)
 [![Security DAST](https://img.shields.io/badge/Styx-AI%20Red--Team-red.svg)](https://github.com/styx-security)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 An enterprise-grade, production-hardened development platform and operational harness enabling **two engineers across two separate workstations** ("Computer 1" and "Computer 2") to build and deploy complex full-stack software autonomously using shared agentic context, distributed lease locks, anti-hallucination shields, native AST mutation testing, and adversarial multi-agent governance.
 

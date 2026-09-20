@@ -11,7 +11,7 @@ Real-time sepsis prediction in ICU patients
 1. **Data Ingestion Moat**: 100Hz bedside physiological waveform stream (ECG/PPG/Arterial line) unavailable in public datasets.
 2. **Algorithmic Moat**: Cross-modal temporal waveform attention transformer predicting micro-vascular collapse 6 hours before shock.
 3. **Statutory Moat**: Statutory HIPAA/DISHA patient privacy isolation, immutable RLS audit trails, and clinical trial compliance.
-4. **Economic Moat**: Local edge inference node ($42/mo hardware amortization) eliminates $1,200/mo per-bed API subscriptions.
+4. **Economic Moat**: Local edge inference node (42/mo hardware amortization) eliminates1,200/mo per-bed API subscriptions.
 
 ## 3. Cryptographic Anti-Tamper Specification
 - **Merkle Chain**: Cryptographic Merkle tree linking every vitals sample to physician sign-off, rendering records unalterable.
