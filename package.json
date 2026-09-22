@@ -10,6 +10,19 @@
     "test:unit": "node --experimental-strip-types --test tests/bootstrap.test.ts",
     "test:adversarial": "node --experimental-strip-types --test tests/adversarial/adversarial-contract.test.ts",
     "test": "npm run test:unit && npm run harness:eval",
+    "dev:backend": "python -m uvicorn demo.bhedak_mvp.backend.main:app --host 127.0.0.1 --port 8000 --reload",
+    "dev:frontend": "npm --prefix demo/bhedak_mvp/frontend run dev",
+    "dev:backend:chakra": "python -m uvicorn app.main:app --app-dir demo/chakra_mvp/backend --host 127.0.0.1 --port 8000 --reload",
+    "dev:frontend:chakra": "npm --prefix demo/chakra_mvp/frontend run dev",
+    "test:chakra": "pytest demo/chakra_mvp/backend/tests -v",
+    "test:backend": "pytest demo/ --cov=demo -q",
+    "test:backend:chakra": "pytest demo/chakra_mvp/backend/tests -v",
+    "test:backend:bhedak": "pytest demo/bhedak_mvp/backend/tests -v",
+    "test:e2e": "playwright test",
+    "test:e2e:chakra": "playwright test e2e/chakra.spec.ts",
+    "test:e2e:bhedak": "playwright test e2e/bhedak.spec.ts",
+    "audit:sast": "bandit -r demo/ -ll -q",
+    "attest:verify": "python -m scripts.orchestrator.squad_attestation --verify",
     "audit:adversarial": "node --experimental-strip-types scripts/adversarial-suite-runner.ts",
     "audit:beta": "node --experimental-strip-types scripts/beta-audit-runner.ts",
     "certify:enterprise": "npm run test && npm run test:adversarial && npm run audit:beta",
@@ -68,6 +81,7 @@
     "skill:synthesize": "node --experimental-strip-types scripts/skill-creator.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.10.2",
     "typescript": "^5.7.2"
   }

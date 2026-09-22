@@ -131,6 +131,84 @@ class SpecSync:
         return cls.persist_document("rfc", name, content, title)
 
     @classmethod
+    def get_all_indexes(cls) -> Dict[str, Dict[str, Any]]:
+        """Returns the status, path, and entry counts for all 6 living index catalogs."""
+        results = {}
+        for doc_type, config in DOCUMENT_CONFIGS.items():
+            base_dir = os.path.join(os.getcwd(), config["dir"])
+            index_path = os.path.join(base_dir, "INDEX.md")
+            exists = os.path.exists(index_path)
+            doc_files = [
+                f for f in os.listdir(base_dir)
+                if f.endswith(".md") and f != "INDEX.md"
+            ] if os.path.exists(base_dir) else []
+            results[doc_type] = {
+                "kind": config["kind"],
+                "dir": config["dir"],
+                "index_path": index_path,
+                "index_exists": exists,
+                "document_count": len(doc_files),
+                "documents": sorted(doc_files)
+            }
+        return results
+
+    @classmethod
+    def sync_brain_artifacts(cls, brain_dir: Optional[str] = None, feature_name: Optional[str] = None) -> List[str]:
+        """
+        Automatically scans the IDE brain artifacts directory and mirrors:
+        - implementation_plan.md -> docs/plans/
+        - walkthrough.md        -> docs/walkthroughs/
+        - *_audit.md            -> docs/audits/
+        into permanent git-tracked storage, updating living INDEX catalogs and the SQLite Memory Vault.
+        """
+        synced_files: List[str] = []
+        search_dirs: List[str] = []
+        if brain_dir and os.path.exists(brain_dir):
+            search_dirs.append(brain_dir)
+        else:
+            app_data = os.path.expanduser(r"~\.gemini\antigravity-ide\brain")
+            if os.path.exists(app_data):
+                conv_dirs = sorted(
+                    [os.path.join(app_data, d) for d in os.listdir(app_data) if os.path.isdir(os.path.join(app_data, d))],
+                    key=lambda p: os.path.getmtime(p),
+                    reverse=True
+                )
+                search_dirs.extend(conv_dirs[:3])
+
+        feat = feature_name or "active_feature"
+        for bdir in search_dirs:
+            # 1. Implementation Plan
+            plan_path = os.path.join(bdir, "implementation_plan.md")
+            if os.path.exists(plan_path):
+                with open(plan_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                if content.strip():
+                    dest = cls.persist_plan(feat, content, f"Implementation Plan: {feat}")
+                    synced_files.append(dest)
+
+            # 2. Walkthrough
+            walkthrough_path = os.path.join(bdir, "walkthrough.md")
+            if os.path.exists(walkthrough_path):
+                with open(walkthrough_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                if content.strip():
+                    dest = cls.persist_walkthrough(feat, content, f"Walkthrough: {feat}")
+                    synced_files.append(dest)
+
+            # 3. Audits
+            for fname in os.listdir(bdir):
+                if fname.endswith(("_audit.md", "-audit.md")) and not fname.startswith("implementation_"):
+                    fpath = os.path.join(bdir, fname)
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        content = f.read()
+                    if content.strip():
+                        audit_name = fname.replace(".md", "").replace("_audit", "")
+                        dest = cls.persist_audit(audit_name, content, f"Audit: {audit_name}")
+                        synced_files.append(dest)
+
+        return synced_files
+
+    @classmethod
     def _update_index(cls, base_dir: str, kind: str, feature: str, filename: str, title: str, config: Dict[str, str]) -> None:
         index_file = os.path.join(base_dir, "INDEX.md")
         timestamp_str = time.strftime("%Y-%m-%d %H:%M")
@@ -203,11 +281,30 @@ class SpecSync:
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="SpecSync Universal Documentation Engine")
-    parser.add_argument("--type", choices=list(DOCUMENT_CONFIGS.keys()), default="plan", help="Document category")
-    parser.add_argument("--name", required=True, help="Feature or document name")
+    parser.add_argument("--type", choices=list(DOCUMENT_CONFIGS.keys()), help="Document category")
+    parser.add_argument("--name", help="Feature or document name")
     parser.add_argument("--file", help="Source file to read content from")
     parser.add_argument("--title", help="Human-readable title")
+    parser.add_argument("--all-indexes", action="store_true", help="Print summary of all 6 living index catalogs")
+    parser.add_argument("--sync-brain", help="Sync brain artifacts directory into in-repo docs/")
     args = parser.parse_args()
+
+    if args.all_indexes:
+        indexes = SpecSync.get_all_indexes()
+        print("\n=== In-Repo Living Documentation Catalogs (6 Document Classes) ===")
+        for doc_type, info in indexes.items():
+            status = "ACTIVE" if info["index_exists"] else "MISSING"
+            print(f"  [{info['kind'].upper():<11}] {info['dir']:<18} | {status} | {info['document_count']} docs | Index: {info['index_path']}")
+        print("==================================================================\n")
+        sys.exit(0)
+
+    if args.sync_brain:
+        synced = SpecSync.sync_brain_artifacts(args.sync_brain, args.name)
+        print(f"[SpecSync] Synchronized {len(synced)} document(s) from brain artifacts.")
+        sys.exit(0)
+
+    if not args.name:
+        parser.error("--name is required unless using --all-indexes or --sync-brain")
 
     content = ""
     if args.file and os.path.exists(args.file):
@@ -216,4 +313,4 @@ if __name__ == "__main__":
     else:
         content = f"# {args.title or args.name}\n\nDocument persisted via SpecSync CLI.\n"
 
-    SpecSync.persist_document(args.type, args.name, content, args.title)
+    SpecSync.persist_document(args.type or "plan", args.name, content, args.title)

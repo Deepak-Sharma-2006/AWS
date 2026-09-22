@@ -162,7 +162,14 @@ export function searchMemories(query: string, kind?: MemoryKind, phase?: number)
     scope: r.scope as "project" | "team",
     phase: r.phase,
     operator: r.operator,
-    tags: JSON.parse(r.tags || "[]"),
+    tags: (() => {
+      try {
+        const parsed = JSON.parse(r.tags || "[]");
+        return Array.isArray(parsed) ? parsed : [String(parsed)];
+      } catch {
+        return (r.tags || "").split(",").map((t: string) => t.trim()).filter(Boolean);
+      }
+    })(),
     createdAt: r.created_at,
     body: r.body,
     filePath: r.file_path,
@@ -211,7 +218,14 @@ export function doctorVault(): { totalFiles: number; totalDbRows: number; reinde
               const title = meta.title || f.replace(/\.md$/, "");
               const phase = parseInt(meta.phase || "1", 10);
               const operator = meta.operator || "Computer1";
-              const tags = meta.tags || "[]";
+              const rawTags = meta.tags || "[]";
+              let tags = rawTags;
+              try {
+                const parsed = JSON.parse(rawTags);
+                tags = JSON.stringify(Array.isArray(parsed) ? parsed : [parsed]);
+              } catch {
+                tags = JSON.stringify(rawTags.split(",").map((t: string) => t.trim()).filter(Boolean));
+              }
               const createdAt = meta.createdAt || new Date().toISOString();
               const body = match[2].trim();
 

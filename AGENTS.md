@@ -208,3 +208,30 @@
    - D3/SVG graph canvas elements must clamp initial zoom scale and center coordinates prior to node injection to eliminate 1-second zoom glitching.
 4. **Headless Geometry Verification**:
    - Playwright browser tests must assert element geometry (`getBoundingClientRect()`) to verify that buttons maintain fixed coordinates across all tab transitions.
+
+---
+
+## 15. Mandatory Chat Prompt 6-Persona Execution Lifecycle Invariant & Universal Playwright Frontend Mandate
+
+1. **Zero Unstructured Generalist Responses in Chat**:
+   - In interactive IDE chat conversations, the agent is strictly prohibited from answering as an unstructured generic assistant.
+   - Every single prompt (regardless of perceived size, whether building a full system or tweaking a button) MUST visibly execute through the 6 Enterprise Personas:
+     - 📋 **`[Product Manager]`**: Deconstruct intent into functional scope, target personas, acceptance criteria, and forbidden states.
+     - 📐 **`[System Architect]`**: Define/verify typed data contracts, schemas, and FSM transition constraints.
+     - 🛑 **`[Adversarial SDET]`**: Formulate red-phase acceptance criteria. Whenever frontend code exists, ALWAYS execute headless Playwright tests (`npm run test:e2e` or `npx playwright test`) with exhaustive elemental assertions.
+     - 💻 **`[Core Engineer]`**: Write/refactor clean, production-grade business logic and UI components to turn tests green.
+     - 🔬 **`[Mutation & Security Auditor]`**: Verify mutation survivability ($\ge 80\%$), check zero secrets, constant-time checks, and fail-closed gates.
+     - 📑 **`[Technical Writer]`**: Generate/update living documentation, Part 7 dossiers, and sync plans/walkthroughs.
+2. **Universal Headless Playwright Mandate for Frontend**:
+   - For all frontend projects in the workspace (`demo/chakra_mvp`, `demo/bhedak_mvp`, and any new web application), automated testing MUST execute via headless Playwright (`@playwright/test`) by default.
+   - Do NOT use slow multimodal browser subagents for regression verification.
+   - Tests must assert every button, badge, tab transition, calculation, modal, and console error with maximum accuracy. A thorough 30–60 second verification window is preferred over hasty shallow checks.
+3. **Deterministic Tooling Delegation vs. Sub-Agent Model**:
+   - Personas must NOT spawn uncontrolled recursive conversational LLM subagents (which causes exponential context degradation, token exhaustion, and 5-minute vision delays).
+   - Instead, personas directly control high-speed, deterministic execution engines: Playwright for E2E DOM tests, AST mutation engines for fault injection, and native test runners for unit logic.
+4. **Operator Empirical Proof Protocol (Anti-Hallucination & Verifiable Attestation Receipt)**:
+   - In chat responses, the agent is strictly forbidden from claiming any test passed, build succeeded, or security gate cleared without executing the real command and printing the exact command line and return code.
+   - Every prompt response must conclude with the **Verifiable Squad Attestation Receipt** emitted by `SquadAttestor` ([scripts/orchestrator/squad_attestation.py](file:///scripts/orchestrator/squad_attestation.py)), containing timestamp, provenance SHA-256 hash, active personas, and verified executed commands.
+   - Attestations are permanently logged to `.agents/audit_trail.log` and SQLite memory vault, verifiable by the operator via `npm run attest:verify`.
+
+

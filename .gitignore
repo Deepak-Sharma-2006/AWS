@@ -23,6 +23,10 @@ __pycache__/
 *$py.class
 *.log
 *.bak
+.coverage
+.coverage.*
+htmlcov/
+
 
 # Operator working notes & scratchpads
 scripts_transcripts*
@@ -41,4 +45,6 @@ specs/*.html
 !specs/presentations/BHEDAK_SIH2026.pptx
 !specs/presentations/CHAKRA_SIH2026.pptx
 
-
+# Playwright artifacts
+test-results/
+playwright-report/

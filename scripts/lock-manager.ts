@@ -79,9 +79,9 @@ export class LocalGitDriver implements LockDriver {
         const expiresAt = new Date(existing.expiresAt);
         const graceEnd = new Date(expiresAt.getTime() + GRACE_PERIOD_SECONDS * 1000);
 
-        // In solo mode, the solo operator seamlessly supersedes previous domain locks
-        if (isSoloMode()) {
-          // Seamless acquisition allowed in solo mode
+        // In solo mode, the designated solo operator seamlessly supersedes previous domain locks
+        if (isSoloMode() && (lease.operator === "SoloOperator" || existing.operator === lease.operator)) {
+          // Seamless acquisition allowed for the designated solo operator
         } else if (now < expiresAt && existing.operator !== lease.operator) {
           console.error(`\n🚨 LOCK CONFLICT: Domain '${lease.domain}' is actively leased to '${existing.operator}' (${existing.role}) on host '${existing.host}'.`);
           console.error(`Expires at: ${existing.expiresAt}. Run 'npm run role:handoff' or wait for release.\n`);
