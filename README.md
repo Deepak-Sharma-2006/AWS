@@ -47,6 +47,10 @@ An enterprise-grade, production-hardened development platform and operational ha
    - Plain-text git-mergeable JSONL (`.agents/memory/vault/records.jsonl`) paired with local SQLite FTS5 database (`.agents/memory/vault.sqlite`) for ultra-fast full-text search.
 10. **Autonomous Dynamic Red-Team DAST (Styx)**:
     - Multi-agent simulated hacker mesh attacks live container sandboxes with Proof-of-Exploit (PoE) verification before code merges.
+11. **Mandatory Chat Prompt 6-Persona Execution Lifecycle**:
+    - In Antigravity IDE chat interactions, generic unstructured responses are forbidden. Every prompt visibly cycles through Product Manager, System Architect, Adversarial SDET, Core Engineer, Mutation Auditor, and Technical Writer.
+12. **Operator Empirical Proof Protocol (Squad Attestation)**:
+    - Eliminates hallucinated test/security claims. Every response concludes with a cryptographically signed execution receipt ([scripts/orchestrator/squad_attestation.py](file:///scripts/orchestrator/squad_attestation.py)) logged to SQLite Memory Vault (`npm run attest:verify`).
 
 ---
 
@@ -63,14 +67,25 @@ python -m scripts.orchestrator.task_dispatcher --task solution --prompt "Autonom
 # 3. Run Enterprise Agile Product Squad on any feature with TDD & AST Mutation Testing
 python -m scripts.orchestrator.task_dispatcher --task squad --feature case_state_manager
 
-# 4. Generate near-Canva level presentation pitch deck (<0.2s compile)
+# 4. Run Headless Playwright Browser E2E Suites (Maximum Elemental Accuracy)
+npm run test:e2e
+npm run test:e2e:chakra
+
+# 5. Run Master Backend Test Suite & SAST Security Scanner
+npm run test:backend
+npm run audit:sast
+
+# 6. Verify Cryptographic Proof & Squad Attestation Ledger
+npm run attest:verify
+
+# 7. Generate near-Canva level presentation pitch deck (<0.2s compile)
 python -m scripts.orchestrator.task_dispatcher --task presentation --prompt "Wildfire Early Detection" --theme "cyber_dark_terminal" --slides 6
 
-# 5. Verify Mutation Testing Kill Rate (Must kill >= 80% mutants)
+# 8. Verify Mutation Testing Kill Rate (Must kill >= 80% mutants)
 python -m scripts.orchestrator.python_mutation_tester src/my_service.py "python -m unittest tests/test_my_service.py"
 npm run test:mutation
 
-# 6. Run Master Audit Trail (Verifies 6/6 enterprise gates)
+# 9. Run Master Audit Trail (Verifies all enterprise gates)
 npm run audit:trail
 ```
 

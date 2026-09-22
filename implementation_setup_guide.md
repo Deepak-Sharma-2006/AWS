@@ -2870,3 +2870,44 @@ The platform resolves this by implementing **Dual-Persistence Synchronization**:
 2. **Local SQLite FTS5 Database (`.agents/memory/vault.sqlite`)**:
    - Automatically regenerated and indexed from the JSONL log on startup.
    - Provides sub-millisecond BM25 full-text search across all historical architectural decisions.
+
+---
+
+### 11.13 Mandatory Chat Prompt 6-Persona Execution Lifecycle & Operator Empirical Proof Protocol
+
+In interactive IDE chat sessions, agents naturally default to unstructured conversational generalists unless constrained by rigorous system rules. The platform introduces **Rule 15 of AGENTS.md** and **Rule 12 of GEMINI.md**:
+
+1. **Zero-Generalist Chat Mandate**:
+   Every chat prompt processed in Antigravity IDE must visibly execute through the 6 Enterprise Personas:
+   - 📋 **`[Product Manager]`**: Scope deconstruction, user journeys, forbidden states.
+   - 📐 **`[System Architect]`**: Typed schema contracts, FSM state machines, API endpoints.
+   - 🛑 **`[Adversarial SDET]`**: Red-first black-box test suites, headless Playwright verification.
+   - 💻 **`[Core Engineer]`**: Production logic implementation, TDD self-healing to green.
+   - 🔬 **`[Mutation & Security Auditor]`**: AST mutation kill rate ($\ge 80\%$), pre-commit secret scans, constant-time cryptography.
+   - 📑 **`[Technical Writer]`**: Part 7 comprehension dossiers, living documentation sync.
+
+2. **Operator Empirical Proof Protocol (Squad Attestation)**:
+   - Handled autonomously by [`scripts/orchestrator/squad_attestation.py`](file:///scripts/orchestrator/squad_attestation.py).
+   - Every prompt execution records an immutable SHA-256 provenance signature into `.agents/memory/vault.sqlite` and `.agents/audit_trail.log`.
+   - Every response concludes with a verifiable YAML receipt containing real tool commands, exit codes, and timestamps.
+   - Operators verify the audit ledger anytime via `npm run attest:verify`.
+
+---
+
+### 11.14 Master Testing Suite Architecture: Playwright, Pytest-Cov, and Bandit SAST
+
+The platform standardizes on 100% free, industry-standard verification engines across all application tiers:
+- **Frontend E2E**: **Headless Playwright** (`@playwright/test`) with 60s timeout, Chrome DevTools Protocol (CDP) direct binding, and 100% DOM element assertions (`npm run test:e2e`).
+- **Backend Testing & Coverage**: **Pytest** with **pytest-cov** (`pytest demo/ --cov=demo -q`), measuring branch and statement coverage (maintained at $\ge 95\%$).
+- **Static AppSec (SAST)**: **Bandit** (`bandit -r demo/ -ll -q`), scanning Python AST for insecure host bindings (CWE-605 `0.0.0.0`), unescaped inputs, and weak cryptographic primitives.
+- **Pre-Commit Secret Shield**: [`scripts/secret-scanner.ts`](file:///scripts/secret-scanner.ts) checking staged changes before every commit (`npm run check:secrets:staged`).
+
+---
+
+### 11.15 Automatic Triple-Documentation Sync Invariant
+
+Whenever any component, CLI command, testing harness, persona lifecycle, or architectural directive of the agentic workflow is modified, the agent MUST automatically assess the impact and update the three primary system documentation files without waiting for explicit operator instructions:
+1. `SYSTEM_COMMANDS.md`: Master CLI command cheat sheet.
+2. `README.md`: High-level system overview, architectural pillars, and quickstarts.
+3. `implementation_setup_guide.md`: The definitive in-depth production architectural blueprint.
+

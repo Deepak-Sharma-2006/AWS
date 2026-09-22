@@ -233,5 +233,11 @@
    - In chat responses, the agent is strictly forbidden from claiming any test passed, build succeeded, or security gate cleared without executing the real command and printing the exact command line and return code.
    - Every prompt response must conclude with the **Verifiable Squad Attestation Receipt** emitted by `SquadAttestor` ([scripts/orchestrator/squad_attestation.py](file:///scripts/orchestrator/squad_attestation.py)), containing timestamp, provenance SHA-256 hash, active personas, and verified executed commands.
    - Attestations are permanently logged to `.agents/audit_trail.log` and SQLite memory vault, verifiable by the operator via `npm run attest:verify`.
+5. **Automatic Triple-Documentation Sync Invariant**:
+   - Whenever any component, CLI command, testing harness, persona lifecycle, or architectural directive of the agentic workflow is modified, the agent MUST automatically assess the impact and update the three primary system documentation files without waiting for explicit operator instructions:
+     1. `SYSTEM_COMMANDS.md`: Master CLI command cheat sheet.
+     2. `README.md`: High-level system overview, architectural pillars, and quickstarts.
+     3. `implementation_setup_guide.md`: The definitive in-depth production architectural blueprint.
+
 
 
