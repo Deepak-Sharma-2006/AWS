@@ -203,6 +203,38 @@ export function runMutationTest(
   }
 }
 
+export function getGitDiffFiles(): string[] {
+  try {
+    const diffOut = execSync("git diff --name-only HEAD", { stdio: "pipe" }).toString();
+    const statusOut = execSync("git status -s", { stdio: "pipe" }).toString();
+    const files = new Set<string>();
+
+    for (const l of diffOut.split("\n")) {
+      const f = l.trim();
+      if ((f.endsWith(".ts") || f.endsWith(".js")) && existsSync(f)) {
+        files.add(f);
+      }
+    }
+
+    for (const l of statusOut.split("\n")) {
+      const trimmed = l.trim();
+      if (trimmed.length > 3) {
+        const f = trimmed.slice(3).trim();
+        if ((f.endsWith(".ts") || f.endsWith(".js")) && existsSync(f)) {
+          files.add(f);
+        }
+      }
+    }
+
+    const srcFiles = Array.from(files).filter(
+      (f) => (f.startsWith("src/") || f.startsWith("src\\")) && !f.includes(".test.") && !f.includes(".spec.")
+    );
+    return srcFiles;
+  } catch {
+    return [];
+  }
+}
+
 const isMain = process.argv[1] && (
   fileURLToPath(import.meta.url) === process.argv[1] ||
   process.argv[1].endsWith("mutation-tester.ts") ||
@@ -210,8 +242,59 @@ const isMain = process.argv[1] && (
 );
 
 if (isMain) {
-  const target = process.argv[2] || "src/index.ts";
-  const cmd = process.argv[3] || "npm run test:unit";
-  const report = runMutationTest(target, cmd);
-  process.exit(report.passedThreshold ? 0 : 1);
+  const args = process.argv.slice(2);
+  let isDiff = args.includes("--diff");
+  const domainIdx = args.indexOf("--domain");
+  const domain = domainIdx !== -1 ? args[domainIdx + 1] : null;
+  const cmd = args.find((a) => a.startsWith("npm") || a.startsWith("node")) || "npm run test:unit";
+
+  // Check codebase scale for autonomous guard
+  try {
+    const { detectProjectScale } = await import("./project-scale-detector.ts");
+    const scaleReport = detectProjectScale();
+    if (scaleReport.isLarge && !isDiff && !args.some((a) => a.endsWith(".ts"))) {
+      console.log(`🛡️  [Auto-Guard]: Large codebase detected (>50,000 LOC: ${scaleReport.totalLoc.toLocaleString()} LOC).`);
+      console.log("   Automatically scoping mutation tests to modified files (--diff) to prevent combinatorial explosion.\n");
+      isDiff = true;
+    }
+  } catch {
+    // Continue with manual args if scale detector fails
+  }
+
+  let targets: string[] = [];
+
+  if (isDiff) {
+    targets = getGitDiffFiles();
+    if (targets.length === 0) {
+      console.log("ℹ️  [Mutation Tester] No modified TypeScript/JavaScript source files found in git diff.");
+      console.log("   Defaulting to core entry point: 'src/index.ts'");
+      targets = existsSync("src/index.ts") ? ["src/index.ts"] : ["scripts/alpha-builder-runner.ts"];
+    } else {
+      console.log(`🎯 [Mutation Tester] Scoped testing to ${targets.length} git-modified source file(s):`);
+      for (const t of targets) console.log(`   • ${t}`);
+    }
+  } else if (domain) {
+    const domainDir = join(process.cwd(), "src", domain);
+    if (existsSync(domainDir)) {
+      targets = [domainDir];
+    } else {
+      targets = [args[0] || "src/index.ts"];
+    }
+  } else {
+    const explicitTarget = args.find((a) => !a.startsWith("--") && (a.endsWith(".ts") || a.endsWith(".js")));
+    targets = [explicitTarget || (existsSync("src/index.ts") ? "src/index.ts" : "scripts/alpha-builder-runner.ts")];
+  }
+
+  let allPassed = true;
+  for (const target of targets) {
+    if (existsSync(target)) {
+      const report = runMutationTest(target, cmd);
+      if (!report.passedThreshold) {
+        allPassed = false;
+      }
+    }
+  }
+
+  process.exit(allPassed ? 0 : 1);
 }
+

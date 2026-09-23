@@ -356,7 +356,7 @@ if __name__ == "__main__":
     parser.add_argument("--file", help="Source file to read content from")
     parser.add_argument("--title", help="Human-readable title")
     parser.add_argument("--all-indexes", action="store_true", help="Print summary of all 6 living index catalogs")
-    parser.add_argument("--sync-brain", help="Sync brain artifacts directory into in-repo docs/")
+    parser.add_argument("--sync-brain", nargs="?", const="AUTO", help="Sync brain artifacts directory into in-repo docs/")
     args = parser.parse_args()
 
     if args.all_indexes:
@@ -369,8 +369,22 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if args.sync_brain:
-        synced = SpecSync.sync_brain_artifacts(args.sync_brain, args.name)
-        print(f"[SpecSync] Synchronized {len(synced)} document(s) from brain artifacts.")
+        target_brain = args.sync_brain
+        if target_brain == "AUTO":
+            app_data = os.path.expanduser(r"~\.gemini\antigravity-ide\brain")
+            if os.path.exists(app_data):
+                dirs = [
+                    os.path.join(app_data, d) for d in os.listdir(app_data)
+                    if os.path.isdir(os.path.join(app_data, d)) and not d.startswith(".") and d != "tempmediaStorage"
+                ]
+                dirs.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+                target_brain = dirs[0] if dirs else None
+
+        if target_brain and os.path.exists(target_brain):
+            synced = SpecSync.sync_brain_artifacts(target_brain, args.name)
+            print(f"[SpecSync] Synchronized {len(synced)} document(s) from brain artifacts ({target_brain}).")
+        else:
+            print("[SpecSync] No active brain directory found to synchronize.")
         sys.exit(0)
 
     if not args.name:

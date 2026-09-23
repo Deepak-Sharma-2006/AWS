@@ -338,4 +338,50 @@ npm run hooks:install
 - **Master Production Architecture Blueprint**: [`docs/architecture/production_architecture_blueprint.md`](file:///docs/architecture/production_architecture_blueprint.md)
 - **Latest Comprehensive Audit**: [`docs/audits/remediation_audit.md`](file:///docs/audits/remediation_audit.md)
 
+---
+
+## 10. Zero-Process Documentation Lifecycle & Living Index Reconciler
+
+Eliminates persistent background daemon overhead while ensuring sub-second brain artifact mirroring and conflict-free Git branch merges across N teammates.
+
+```bash
+# 1. Zero-Process Turn-Egress Sync (Synchronously mirrors brain artifacts to docs/ and exits)
+npm run docs:sync
+python -m scripts.orchestrator.spec_sync --sync-brain
+
+# 2. Daemon Lifecycle Management (Optional background watcher with PID tracking)
+npm run docs:start     # Launch background daemon and save PID to .agents/state/docs-watcher.pid
+npm run docs:status    # Inspect active watcher status, PID, and memory footprint
+npm run docs:stop      # Gracefully terminate background watcher without orphaned processes
+
+# 3. Team Mesh Living Index Reconciliation & Merge Driver
+npm run docs:reconcile # Deterministically rebuild all living catalogs sorted by timestamp descending
+npm run docs:indexes   # Re-index all 6 living catalog classes via SpecSync
+```
+
+---
+
+## 11. Real-Time Context Window Telemetry & Codebase Scale Guards
+
+Monitors active conversation memory saturation, tracks remaining headroom before IDE auto-compaction, and autonomously applies large-project scaling policies.
+
+```bash
+# 1. Inspect Active Chat Context Window & Compaction Headroom
+npm run context:check  # Measures live post-compaction context tokens, headroom, and saturation
+npm run context:status # Alias for context check
+
+# 2. Detect Codebase Scale (Small <5k LOC, Medium 5k-50k LOC, Large >50k LOC)
+npm run project:scale  # Scans repository LOC and outputs autonomous execution directives
+
+# 3. Intelligent Mutation Testing with Auto-Scoping
+npm run test:mutation             # Tests fault injection on active product domain (auto-enforces --diff on large projects)
+npm run test:mutation -- --diff    # Explicitly scopes fault injection to git-modified source files
+
+# 4. Set Workspace Model Profile (Updates model ceiling and rate calculations)
+npm run token:set-model gemini-3.8-flash-high # Locks active model to Gemini 3.8 Flash High (1M ceiling)
+npm run token:models                          # Lists all supported Antigravity frontier models
+npm run token:budget                          # Displays token budget usage and saturation directives
+```
+
+
 

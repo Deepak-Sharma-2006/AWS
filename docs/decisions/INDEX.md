@@ -1,10 +1,14 @@
-# Enterprise Architecture Decisions
+# Master Living Catalog: Decisions
 
-> Permanent records of fundamental architectural choices, trade-offs, and moats.
+> **Status**: ACTIVE | Automated Living Index | Reconciled via Team Mesh Engine
 
-- **2026-09-21 02:03** | [ADR 001: Universal Documentation & Git-Mergeable Memory](2026-09-21_001_universal_documentation_adr.md) | *Scope: 001_universal_documentation*
-- **2026-09-21 02:20** | [ADR: BHEDAK: Sovereign Autonomous Threat Triangulation Platform](2026-09-21_test_adr.md) | *Scope: Test*
-- **2026-09-21 02:20** | [ADR: AGRIVISION: Autonomous Multispectral Edge Drone Swarm](2026-09-21_test_solution_adr.md) | *Scope: Test Solution*
-- **2026-09-21 02:21** | [ADR: SIH2026-CORE: Autonomous SIH-2026: Satellite Fire Early Warning Platform](2026-09-21_sih_2026__satellite_fire_early_warning_adr.md) | *Scope: SIH-2026: Satellite Fire Early Warning*
-- **2026-09-23 08:16** | [ADR: db_migration](2026-09-23_db_migration_adr.md) | *Scope: db_migration*
-- **2026-09-23 09:23** | [ADR: db_migration](2026-09-23_db_migration_decision.md) | *Scope: db_migration*
+Total Registered Documents: **6**
+
+| Timestamp | Document Title | File Name | Link |
+| :--- | :--- | :--- | :--- |
+| `2026-09-23` | **ADR: DB_MIGRATION Architecture Decision Record** | `2026-09-23_db_migration_decision.md` | [View Document](file:///docs/decisions/2026-09-23_db_migration_decision.md) |
+| `2026-09-23` | **ADR: DB_MIGRATION Architecture Decision Record** | `2026-09-23_db_migration_adr.md` | [View Document](file:///docs/decisions/2026-09-23_db_migration_adr.md) |
+| `2026-09-21` | **ADR: Architecture Decision Record for MEDGUARD: Real-Time Edge AI Waveform Sepsis Predictor** | `2026-09-21_test_solution_adr.md` | [View Document](file:///docs/decisions/2026-09-21_test_solution_adr.md) |
+| `2026-09-21` | **ADR: Architecture Decision Record for BHEDAK: Sovereign Autonomous Threat Triangulation Platform** | `2026-09-21_test_adr.md` | [View Document](file:///docs/decisions/2026-09-21_test_adr.md) |
+| `2026-09-21` | **ADR: Architecture Decision Record for SIH2026-CORE: Autonomous SIH-2026: Satellite Fire Early Warning Platform** | `2026-09-21_sih_2026__satellite_fire_early_warning_adr.md` | [View Document](file:///docs/decisions/2026-09-21_sih_2026__satellite_fire_early_warning_adr.md) |
+| `2026-09-21` | **ADR 001: Adoption of Universal 6-Class In-Repo Documentation & Git-Mergeable Memory** | `2026-09-21_001_universal_documentation_adr.md` | [View Document](file:///docs/decisions/2026-09-21_001_universal_documentation_adr.md) |

@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync, chmodSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "node:url";
+import { installGitMergeDriver } from "./index-reconciler.ts";
 
 export function installGitHooks(): boolean {
   const hooksDir = join(process.cwd(), ".git/hooks");
@@ -8,9 +9,10 @@ export function installGitHooks(): boolean {
     mkdirSync(hooksDir, { recursive: true });
   }
 
+  // 1. Pre-commit Hook
   const preCommitHook = `#!/bin/sh
 # Antigravity Autonomous Pre-Commit Shield: Zero-Secret, Zero-LaTeX & Anti-Hallucination Gate
-echo "🔒 [Pre-Commit Gate 1/3] Verifying zero secrets in staged changes..."
+echo "🔒 [Pre-Commit Gate 1/4] Verifying zero secrets in staged changes..."
 node --experimental-strip-types scripts/secret-scanner.ts --staged
 if [ $? -ne 0 ]; then
   echo "🛑 [COMMIT REJECTED] Secret scanner detected forbidden secrets in staged diff!"
@@ -18,7 +20,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "📝 [Pre-Commit Gate 2/3] Verifying Zero-LaTeX compliance across markdown documentation..."
+echo "📝 [Pre-Commit Gate 2/4] Verifying Zero-LaTeX compliance across markdown documentation..."
 node --experimental-strip-types scripts/markdown-linter.ts docs
 if [ $? -ne 0 ]; then
   echo "🛑 [COMMIT REJECTED] Markdown linter detected raw LaTeX delimiters ($ or $$)!"
@@ -26,7 +28,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "🛡️ [Pre-Commit Gate 3/3] Verifying Zero Ghost Packages & AST import grounding..."
+echo "🛡️ [Pre-Commit Gate 3/4] Verifying Zero Ghost Packages & AST import grounding..."
 node --experimental-strip-types scripts/anti-hallucination-checker.ts scripts src tests browser_tests
 if [ $? -ne 0 ]; then
   echo "🛑 [COMMIT REJECTED] Anti-hallucination scanner detected undeclared package imports!"
@@ -34,20 +36,38 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "✅ [Pre-Commit Barrier Complete] All 3 enterprise gates passed with zero violations."
+echo "📑 [Pre-Commit Gate 4/4] Reconciling Team Mesh Living Documentation Catalogs..."
+node --experimental-strip-types scripts/index-reconciler.ts
+
+echo "✅ [Pre-Commit Barrier Complete] All 4 enterprise gates passed with zero violations."
 exit 0
 `;
 
   const hookPath = join(hooksDir, "pre-commit");
   writeFileSync(hookPath, preCommitHook, "utf-8");
 
+  // 2. Post-merge Hook
+  const postMergeHook = `#!/bin/sh
+# Team Mesh Living Index Automatic Post-Merge Reconciler
+echo "📑 [Post-Merge Hook] Reconciling Team Mesh Living Documentation Catalogs..."
+node --experimental-strip-types scripts/index-reconciler.ts
+exit 0
+`;
+
+  const postMergePath = join(hooksDir, "post-merge");
+  writeFileSync(postMergePath, postMergeHook, "utf-8");
+
   try {
     chmodSync(hookPath, 0o755);
+    chmodSync(postMergePath, 0o755);
   } catch {
     // Windows may ignore chmod
   }
 
-  console.log(`✅ [Git Hook Installed] Pre-commit 3-gate barrier installed at: ${hookPath}`);
+  // 3. Install Git Merge Driver for docs/**/INDEX.md
+  installGitMergeDriver();
+
+  console.log(`✅ [Git Hooks Installed] Pre-commit 4-gate barrier and post-merge reconciler configured.`);
   return true;
 }
 
@@ -60,3 +80,4 @@ const isMain = process.argv[1] && (
 if (isMain) {
   installGitHooks();
 }
+

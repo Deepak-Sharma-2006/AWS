@@ -103,20 +103,92 @@ class SquadAttestor:
         }
 
     @classmethod
+    def get_context_telemetry(cls) -> Optional[Dict[str, Any]]:
+        try:
+            app_data = os.path.expanduser(r"~\.gemini\antigravity-ide\brain")
+            if not os.path.exists(app_data):
+                return None
+            dirs = [
+                os.path.join(app_data, d) for d in os.listdir(app_data)
+                if os.path.isdir(os.path.join(app_data, d)) and not d.startswith(".") and d != "tempmediaStorage"
+            ]
+            if not dirs:
+                return None
+            dirs.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+            active_dir = dirs[0]
+            transcript_path = os.path.join(active_dir, ".system_generated", "logs", "transcript.jsonl")
+            if not os.path.exists(transcript_path):
+                return None
+
+            # Model info from active-model.json
+            active_model_file = os.path.join(".agents", "state", "active-model.json")
+            model_name = "Gemini 3.8 Flash High"
+            ceiling = 1048576
+            if os.path.exists(active_model_file):
+                try:
+                    with open(active_model_file, "r", encoding="utf-8") as f:
+                        mdata = json.load(f)
+                        model_name = mdata.get("name", model_name)
+                        ceiling = mdata.get("contextCeiling", ceiling)
+                except Exception:
+                    pass
+
+            total_bytes = 0
+            post_compaction_bytes = 0
+            with open(transcript_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    sz = len(line.encode("utf-8"))
+                    total_bytes += sz
+                    try:
+                        data = json.loads(line)
+                        if data.get("type") == "CHECKPOINT" and "Resuming from a compaction" in str(data.get("content", "")):
+                            post_compaction_bytes = 0
+                    except Exception:
+                        pass
+                    post_compaction_bytes += sz
+
+            active_tokens = round(post_compaction_bytes / 3.8)
+            cumulative_tokens = round(total_bytes / 3.8)
+            remaining = max(0, ceiling - active_tokens)
+            sat = round((active_tokens / ceiling) * 100, 1)
+
+            status = "OPTIMAL" if sat < 40 else "MODERATE" if sat < 65 else "WARNING" if sat < 80 else "CRITICAL"
+
+            return {
+                "model": f"{model_name} ({ceiling:,} ceiling)",
+                "active_chat_context": active_tokens,
+                "remaining_before_compaction": remaining,
+                "saturation": f"{sat}% [{status}]",
+                "cumulative_session_tokens": cumulative_tokens
+            }
+        except Exception:
+            return None
+
+    @classmethod
     def format_receipt_markdown(cls, attestation: Dict[str, Any]) -> str:
         prov = attestation["provenance_hash"]
         ts = attestation["timestamp"]
         cmds = attestation["payload"]["commands"]
         personas = ", ".join(attestation["active_personas"])
+        telemetry = cls.get_context_telemetry()
 
         lines = [
             "```yaml",
             "squad_execution_attestation:",
             f'  timestamp: "{ts}"',
             f'  provenance_hash: "sha256:{prov}"',
-            f'  active_personas: [{personas}]',
-            "  verified_commands:"
+            f'  active_personas: [{personas}]'
         ]
+
+        if telemetry:
+            lines.append("  context_telemetry:")
+            lines.append(f'    model: "{telemetry["model"]}"')
+            lines.append(f'    active_chat_context: {telemetry["active_chat_context"]:,}')
+            lines.append(f'    remaining_before_compaction: {telemetry["remaining_before_compaction"]:,}')
+            lines.append(f'    saturation: "{telemetry["saturation"]}"')
+            lines.append(f'    cumulative_session_tokens: {telemetry["cumulative_session_tokens"]:,}')
+
+        lines.append("  verified_commands:")
         for c in cmds:
             lines.append(f'    - cmd: "{c.get("cmd", "")}"')
             lines.append(f'      exit_code: {c.get("exit_code", 0)}')

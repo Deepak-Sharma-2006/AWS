@@ -121,6 +121,12 @@ npm run test:mutation
 
 # 9. Run Master Audit Trail (Verifies all enterprise gates)
 npm run audit:trail
+
+# 10. Check live active conversation context window & compaction headroom
+npm run context:check
+
+# 11. Synchronize brain documentation (Zero-Process Turn-Egress Architecture)
+npm run docs:sync
 ```
 
 ---
