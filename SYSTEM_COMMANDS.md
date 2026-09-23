@@ -19,7 +19,7 @@ python -m scripts.orchestrator.task_dispatcher --task solution --title "PRAVAH F
 ```
 *Outputs: Automatically persisted and cataloged in:*
 - `docs/plans/` & `docs/plans/INDEX.md` (Implementation Plan & Solution Dossier)
-- `docs/adrs/` & `docs/adrs/INDEX.md` (Architecture Decision Record)
+- `docs/decisions/` & `docs/decisions/INDEX.md` (Architecture Decision Record)
 - `docs/research/` & `docs/research/INDEX.md` (Multi-Hop Research Triangulation Dossier)
 - Dual-persisted to SQLite Memory Vault (`.agents/memory/vault.sqlite`) and JSONL (`.agents/memory/vault/records.jsonl`).
 
@@ -53,17 +53,31 @@ python -m scripts.orchestrator.task_dispatcher --task presentation --prompt "Sov
 
 ---
 
-### Task 4 / Enterprise Product Squad: 6-Pillar Autonomous Squad Run
-Simulates the full enterprise product team: Product Manager, System Architect, Adversarial SDET, Core Engineer, Mutation Auditor, and Technical Writer.
+### Task 4 / Enterprise Product Squad: 6+1 Pillar Autonomous Squad Run
+Simulates the full enterprise product team across the 9-phase SDLC: Deep Research Specialist, Product Manager, System Architect, Adversarial SDET, Core Engineer, Mutation Auditor, and Technical Writer.
 
 ```bash
-# Execute end-to-end squad workflow on a target feature
+# Execute end-to-end squad workflow on a target feature (PM auto-triggers pre-flight research)
 python -m scripts.orchestrator.task_dispatcher --task squad --feature case_state_manager
 
 # View live mode status (Solo vs Dual-Lead 50/50)
 npm run mode:status
 ```
-*Outputs: Execution proof, walkthough dossier in `docs/walkthroughs/`, and updated living index.*
+
+---
+
+### Task 5: Multi-Hop Deep Research & Post-Production Impact Analysis
+Executes the Deep Research Specialist across 4 modes (EXPLORATION, FEASIBILITY, DIAGNOSTIC, IMPACT) with a minimum 120-second deliberation window, keyless search connectors, Jina Reader (`r.jina.ai`) markdown parsing, and automatic living catalog persistence in `docs/research/`.
+
+```bash
+# Pre-Flight Statutory, Competitive SOTA & CVE Exploration
+python -m scripts.orchestrator.task_dispatcher --task research --title "Quantum Crypto Ingestion" --domain "Cyber Defense" --research-mode EXPLORATION
+
+# Post-Production Empirical Impact Analysis (Playwright, Pytest, Mutation, SAST metrics)
+python -m scripts.orchestrator.task_dispatcher --task impact --title "Production Platform" --domain "Enterprise AI"
+```
+*Outputs: Deep Research Dossier in `docs/research/` and updated [`docs/research/INDEX.md`](file:///docs/research/INDEX.md).*
+*Outputs: Execution proof, walkthrough dossier in `docs/walkthroughs/`, and updated living index.*
 
 ---
 
@@ -76,9 +90,9 @@ Every system artifact is permanently version-controlled under `docs/` and tracke
 | **Implementation Plans** | `docs/plans/` | [`docs/plans/INDEX.md`](file:///docs/plans/INDEX.md) | Feature PRDs, phase roadmaps, and execution plans |
 | **Walkthroughs** | `docs/walkthroughs/` | [`docs/walkthroughs/INDEX.md`](file:///docs/walkthroughs/INDEX.md) | End-of-turn execution records, test proof, and diffs |
 | **System Audits** | `docs/audits/` | [`docs/audits/INDEX.md`](file:///docs/audits/INDEX.md) | System readiness probes, adversarial red-team DAST |
-| **Architecture Decisions** | `docs/adrs/` | [`docs/adrs/INDEX.md`](file:///docs/adrs/INDEX.md) | Architectural trade-offs, moats, and non-negotiables |
+| **Architecture Decisions** | `docs/decisions/` | [`docs/decisions/INDEX.md`](file:///docs/decisions/INDEX.md) | Architectural trade-offs, moats, and non-negotiables |
 | **Research Dossiers** | `docs/research/` | [`docs/research/INDEX.md`](file:///docs/research/INDEX.md) | Multi-hop statutory, competitive, and CVE research |
-| **Formal RFCs & Contracts** | `docs/rfcs/` | [`docs/rfcs/INDEX.md`](file:///docs/rfcs/INDEX.md) | API schemas, data contracts, and state machines |
+| **Formal Specifications & Contracts** | `docs/specifications/` | [`docs/specifications/INDEX.md`](file:///docs/specifications/INDEX.md) | API schemas, data contracts, and state machines |
 
 ```bash
 # Synchronize and re-index all 6 documentation catalogs
@@ -188,7 +202,7 @@ python -m scripts.orchestrator.task_dispatcher --task audit --target ./my_existi
 python -m scripts.orchestrator.task_dispatcher --task audit --target ./my_existing_project/ --auto-heal
 
 # Audit a standalone solution blueprint markdown file
-python -m scripts.orchestrator.task_dispatcher --task audit --target docs/sih_solutions/solution_blueprint.md
+python -m scripts.orchestrator.task_dispatcher --task audit --target docs/architecture/production_architecture_blueprint.md
 ```
 *Outputs: Diagnostic dossier at `docs/audits/remediation_audit.md` with health score, flaw matrix, and prioritized remediation plan.*
 
@@ -231,45 +245,81 @@ npm run audit:trail
 
 ---
 
-## 6. Distributed Domain Lease Locking (2-Computer Collaboration)
+## 6. Distributed Domain Lease Locking & N-Person Team Mesh (Hackathons & Multi-Device)
 
-Supports dual storage modes: **LocalGitDriver** (offline default using `.agents/state/locks/`) and **CloudHttpDriver** (Supabase / REST remote coordination without Git merge conflicts).
+Supports three operating modes: **Solo Mode** (`npm run mode:solo`), **Dual Mode** (`npm run mode:dual`), and **Team Mesh Mode** (`npm run mode:team`) for arbitrary N-developer teams across multiple laptops.
 
 ```bash
-# Inspect all active domain leases (Local Mode)
-node --experimental-strip-types scripts/lock-manager.ts status
+# Toggle between operating modes
+npm run mode:solo                # Single Dev / Autonomous Squad (bypasses multi-host locks)
+npm run mode:dual                # 2-Person 50/50 Dual-Lead Rotation (Computer 1 Alpha <-> Computer 2 Beta)
+npm run mode:team                # N-Person Team Mesh Mode (Arbitrary parallel domain leases)
 
-# Inspect active domain leases (Cloud Mode)
-node --experimental-strip-types scripts/lock-manager.ts status --cloud
+# Inspect active team roster, machines, and domain leases across all laptops
+npm run team:status
 
-# Acquire exclusive domain lease (Lead 1 Alpha or Lead 2 Beta)
-node --experimental-strip-types scripts/lock-manager.ts acquire --domain core --operator "Deepak" --role Alpha --ttl 7200
+# Acquire exclusive domain lease (any developer, any domain)
+node --experimental-strip-types scripts/lock-manager.ts acquire --domain auth --operator Alice --role DomainLead
+node --experimental-strip-types scripts/lock-manager.ts acquire --domain frontend --operator Bob --role DomainLead
 
-# Transfer lease during phase handoff
-node --experimental-strip-types scripts/lock-manager.ts transfer --domain core --operator "Deepak" --to "Partner" --role Beta
+# Release or transfer domain lease
+node --experimental-strip-types scripts/lock-manager.ts release --domain auth --operator Alice
+node --experimental-strip-types scripts/lock-manager.ts transfer --domain auth --from Alice --to Charlie
 
-# Release lease
-node --experimental-strip-types scripts/lock-manager.ts release --domain core --operator "Deepak"
+# Launch zero-dependency local LAN synchronization server (for offline hackathons)
+npm run lan:start                # Runs on port 4040; teammates point $env:LOCK_WEBHOOK_URL="http://<IP>:4040"
 ```
 
 ---
 
-## 7. Key Documentation & Reference Artifacts
+## 7. Brownfield Ingestion & In-Progress Resumption Engine
+
+Audits existing completed projects across 5 enterprise pillars or onboards half-built codebases, repairing stubs and resuming feature delivery via TDD without regressions.
+
+```bash
+# 1. Audit an existing/completed project (Scenario A: 5-pillar health audit & improvement matrix)
+npm run audit:project -- --target <path_to_project>
+python -m scripts.orchestrator.task_dispatcher --task audit --target src/
+
+# 2. Audit and auto-heal broken stubs (raise NotImplementedError, TODOs, failing tests)
+python -m scripts.orchestrator.task_dispatcher --task audit --target <path> --auto-heal
+
+# 3. Onboard an in-progress project and continue feature development (Scenario B: Delta WBS)
+npm run continue:project -- --target <path>
+python -m scripts.orchestrator.task_dispatcher --task continue --target <path>
+```
+*Outputs: Executive diagnostic dossiers in `docs/audits/` and Delta WBS plans in `docs/plans/` indexed via SpecSync.*
+
+---
+
+## 8. Universal Multi-Harness Instruction Sync & Standard MCP Server
+
+Ensures 100% operational rule parity across all AI agent tools (Claude Code, Cursor, Windsurf, Copilot, Codex) and exposes orchestrator tools via standard Model Context Protocol.
+
+```bash
+# Compile and synchronize AGENTS.md rules into all 6 agent harness configurations
+npm run harness:sync
+# Outputs: CLAUDE.md, .cursorrules, .cursor/rules/agentic-workflow.mdc, .windsurfrules, .github/copilot-instructions.md, CODEX.md
+
+# Start standard Model Context Protocol (MCP) server for Claude Desktop, Cursor, and Windsurf
+npm run mcp:start
+
+# Install 3-gate pre-commit barrier (.git/hooks/pre-commit: Secrets + Zero-LaTeX + Anti-Hallucination)
+npm run hooks:install
+```
+
+---
+
+## 9. Key Documentation & Reference Artifacts
 
 - **Living Document Indexes**:
   - Implementation Plans: [`docs/plans/INDEX.md`](file:///docs/plans/INDEX.md)
   - Walkthroughs: [`docs/walkthroughs/INDEX.md`](file:///docs/walkthroughs/INDEX.md)
   - System Audits: [`docs/audits/INDEX.md`](file:///docs/audits/INDEX.md)
-  - Architecture Decisions (ADRs): [`docs/adrs/INDEX.md`](file:///docs/adrs/INDEX.md)
+  - Architecture Decisions: [`docs/decisions/INDEX.md`](file:///docs/decisions/INDEX.md)
   - Research Dossiers: [`docs/research/INDEX.md`](file:///docs/research/INDEX.md)
-  - Formal RFCs & Schemas: [`docs/rfcs/INDEX.md`](file:///docs/rfcs/INDEX.md)
-- **Comprehensive Setup & Architecture Guide**: [implementation_setup_guide.md](file:///implementation_setup_guide.md)
-- **SIH Problem Solution Blueprints**: Located in `docs/sih_solutions/`
-  - `docs/sih_solutions/sih-2026-mha-vasp-attribution-blueprint.md` (MHA I4C Cryptocurrency VASP Attribution)
-  - `docs/sih_solutions/sih-2026-ntro-solution-blueprint.md` (NTRO Critical Infrastructure SAR Anomaly Detection)
-- **Golden Reference Presentations**: Located in `specs/presentations/`
-  - `specs/presentations/BHEDAK_SIH2026.pptx` (Championship Reference Deck)
-  - `specs/presentations/CHAKRA_SIH2026.pptx` (Championship Reference Deck)
-  - `specs/presentations/assets/` (Visual vector and diagram fixtures)
-- **Latest Comprehensive Audit**: [`docs/audits/2026-09-21_agentic_workflow_comprehensive_audit.md`](file:///docs/audits/2026-09-21_agentic_workflow_comprehensive_audit.md)
+  - Specifications & Contracts: [`docs/specifications/INDEX.md`](file:///docs/specifications/INDEX.md)
+- **Master Production Architecture Blueprint**: [`docs/architecture/production_architecture_blueprint.md`](file:///docs/architecture/production_architecture_blueprint.md)
+- **Latest Comprehensive Audit**: [`docs/audits/remediation_audit.md`](file:///docs/audits/remediation_audit.md)
+
 

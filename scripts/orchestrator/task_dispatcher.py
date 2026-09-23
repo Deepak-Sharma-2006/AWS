@@ -18,6 +18,7 @@ from typing import Dict, Any, Optional
 from scripts.orchestrator.solution_council import SolutionCouncil
 from scripts.orchestrator.coding_engine import CodingEngine
 from scripts.orchestrator.project_auditor import ProjectAuditor
+from scripts.orchestrator.research_triangulator import ResearchTriangulator
 from scripts.engine.planner import OmniDeckPlanner
 from scripts.engine.deck_orchestrator import DeckOrchestrator
 
@@ -47,8 +48,12 @@ class TaskDispatcher:
             return cls._handle_memory(**kwargs)
         elif task_clean in ("squad", "agile", "enterprise", "team", "lifecycle"):
             return cls._handle_squad(**kwargs)
+        elif task_clean in ("research", "deep_research", "investigate"):
+            return cls._handle_research(**kwargs)
+        elif task_clean in ("impact", "post_production", "product_analysis"):
+            return cls._handle_impact(**kwargs)
         else:
-            raise ValueError(f"Unknown task type '{task}'. Supported: solution, code, presentation, audit, continue, memory, squad")
+            raise ValueError(f"Unknown task type '{task}'. Supported: solution, code, presentation, audit, continue, memory, squad, research, impact")
 
     @classmethod
     def _handle_solution(cls, **kwargs) -> Dict[str, Any]:
@@ -277,10 +282,47 @@ class {class_name}:
         import dataclasses
         return dataclasses.asdict(res)
 
+    @classmethod
+    def _handle_research(cls, **kwargs) -> Dict[str, Any]:
+        """Dispatches to DeepResearchSpecialist / ResearchTriangulator."""
+        title = kwargs.get("title") or kwargs.get("prompt") or "Autonomous System Research"
+        text = kwargs.get("text") or kwargs.get("prompt") or title
+        domain = kwargs.get("domain", "General Engineering")
+        mode = kwargs.get("research_mode") or kwargs.get("mode") or "EXPLORATION"
+        min_time = kwargs.get("min_time", 0.0)
+
+        print(f"\n[TaskDispatcher] Routing to Deep Research Specialist ({domain}, mode: {mode})...")
+        res = ResearchTriangulator.triangulate(
+            problem_title=title,
+            problem_text=text,
+            domain=domain,
+            mode=mode,
+            min_deliberation_seconds=float(min_time)
+        )
+        import dataclasses
+        return dataclasses.asdict(res)
+
+    @classmethod
+    def _handle_impact(cls, **kwargs) -> Dict[str, Any]:
+        """Dispatches to ResearchTriangulator for Post-Production Impact Analysis."""
+        title = kwargs.get("title") or kwargs.get("feature") or kwargs.get("target") or "Production Platform"
+        domain = kwargs.get("domain", "Enterprise Software")
+        metrics = kwargs.get("empirical_metrics") or {}
+
+        print(f"\n[TaskDispatcher] Routing to Post-Production Impact Analysis ({title})...")
+        res = ResearchTriangulator.triangulate(
+            problem_title=title,
+            domain=domain,
+            mode="IMPACT",
+            empirical_metrics=metrics
+        )
+        import dataclasses
+        return dataclasses.asdict(res)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Universal Task Dispatcher for Enterprise Agentic System")
-    parser.add_argument("--task", required=True, choices=["solution", "code", "presentation", "audit", "continue", "memory", "squad"], help="Task to execute")
+    parser.add_argument("--task", required=True, choices=["solution", "code", "presentation", "audit", "continue", "memory", "squad", "research", "impact"], help="Task to execute")
     parser.add_argument("--target", help="Target project directory or blueprint file for audit/remediation or continuation")
     parser.add_argument("--feature", default="case_service", help="Feature name for squad lifecycle")
     parser.add_argument("--mode", default="solo", choices=["solo", "dual"], help="Operator mode (solo or dual)")
@@ -293,6 +335,8 @@ def main():
     parser.add_argument("--slides", type=int, default=6, help="Number of presentation slides")
     parser.add_argument("--export-pdf", action="store_true", help="Explicit order to export approved PPTX to PDF")
     parser.add_argument("--query", default="", help="Memory search query")
+    parser.add_argument("--research-mode", default="EXPLORATION", choices=["EXPLORATION", "FEASIBILITY", "DIAGNOSTIC", "IMPACT"], help="Research mode")
+    parser.add_argument("--min-time", type=float, default=0.0, help="Minimum deliberation seconds (0 for rapid, 120 for deep)")
 
     args = parser.parse_args()
 
@@ -309,7 +353,9 @@ def main():
         theme=args.theme,
         slides=args.slides,
         export_pdf=args.export_pdf,
-        query=args.query
+        query=args.query,
+        research_mode=args.research_mode,
+        min_time=args.min_time
     )
     print("\n[TaskDispatcher] Task Result:")
     import dataclasses

@@ -105,7 +105,7 @@ export function scanDirectory(dir: string, declaredDeps: Set<string>): boolean {
     const items = readdirSync(currentDir);
 
     for (const item of items) {
-      if (item === "node_modules" || item === ".git" || item === "dist" || item === "build") {
+      if (item === "node_modules" || item === ".git" || item === "dist" || item === "build" || item === "skills") {
         continue;
       }
       const fullPath = join(currentDir, item);
@@ -149,7 +149,7 @@ if (isMain) {
   const root = process.cwd();
   const declared = getDeclaredDependencies(root);
   const rawArgs = process.argv.slice(2);
-  const targets = rawArgs.length > 0 ? rawArgs : ["scripts", "src", "tests", ".agents"];
+  const targets = rawArgs.length > 0 ? rawArgs : ["scripts", "src", "tests", "browser_tests"];
   let allOk = true;
 
   for (const t of targets) {

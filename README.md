@@ -13,44 +13,78 @@ An enterprise-grade, production-hardened development platform and operational ha
 
 ## ⚡ Core Architectural Pillars
 
-1. **Dual-Mode Operator Architecture (Solo vs Dual)**:
+1. **Tri-Mode Operator Architecture (Solo, Dual, and Team Mesh)**:
    - **Solo Mode (`npm run mode:solo`)**: Instant solo-developer velocity. Automatically supersedes distributed lock contention while preserving subagent persona separation.
    - **Dual Mode (`npm run mode:dual`)**: Symmetrical 50/50 dual-lead workflow alternating across Computer 1 (Alpha) and Computer 2 (Beta).
-   - Check status anytime via `npm run mode:status`.
+   - **Team Mesh Mode (`npm run mode:team`)**: Dynamic multi-developer scaling for hackathons and squads (N persons). Arbitrary parallel domain leases (`auth`, `billing`, `frontend`, `qa`) with automated Git-sync and local LAN sync server (`npm run lan:start`).
+   - Check status anytime via `npm run team:status` or `npm run mode:status`.
 2. **Universal In-Repo Living Documentation Architecture (6 Classes)**:
    - Eliminates ephemeral, orphaned conversation artifacts. Every technical artifact is permanently version-controlled under `docs/` and cataloged in living markdown indexes:
      - `docs/plans/` ([INDEX.md](file:///docs/plans/INDEX.md)) — Feature PRDs, phase roadmaps, and execution plans.
      - `docs/walkthroughs/` ([INDEX.md](file:///docs/walkthroughs/INDEX.md)) — End-of-turn execution walkthroughs and test proofs.
-     - `docs/audits/` ([INDEX.md](file:///docs/audits/INDEX.md)) — System readiness probes, pentests, and flaw analyses.
-     - `docs/adrs/` ([INDEX.md](file:///docs/adrs/INDEX.md)) — Architecture Decision Records preserving trade-offs and moats.
+     - `docs/audits/` ([INDEX.md](file:///docs/audits/INDEX.md)) — System readiness probes, security audits, and flaw analyses.
+     - `docs/decisions/` ([INDEX.md](file:///docs/decisions/INDEX.md)) — Enterprise Architecture Decisions preserving trade-offs and moats.
      - `docs/research/` ([INDEX.md](file:///docs/research/INDEX.md)) — Multi-hop statutory, competitive, and CVE research dossiers.
-     - `docs/rfcs/` ([INDEX.md](file:///docs/rfcs/INDEX.md)) — Formal API schemas, state machines, and data contracts.
-3. **Hierarchical Agile Product Squad & Fail-Closed Playwright**:
-   - Simulates a full enterprise product team: Product Manager, System Architect, Adversarial SDET, Core Engineer, Mutation Auditor, and Technical Writer.
-   - Enforces the **Red-to-Green Test Invariant**: SDET tests must be written first and verified RED before implementation begins.
-   - **Fail-Closed Frontend Gate**: If frontend files exist, headless Playwright verification is strictly required (rejects builds with exit code `1` if tests are missing or broken).
-4. **Deterministic AST Mutation Testing (≥ 80% Kill Rate)**:
-   - Dual-engine AST fault injection: Python native AST (`python_mutation_tester.py`) and TypeScript (`mutation-tester.ts`).
-   - Injects boundary inversions, boolean flips, arithmetic mutations, and return overrides with atomic `.bak` rollback on process interrupts.
+     - `docs/specifications/` ([INDEX.md](file:///docs/specifications/INDEX.md)) — Formal typed interface schemas, state machines, and data contracts.
+3. **Hierarchical 6+1 Agile Product Squad & Complete 9-Phase SDLC**:
+   - Simulates a full enterprise product team across all 9 SDLC phases:
+     - Phase 0: Discovery & Market/Statutory Research (`deep_research_specialist`)
+     - Phase 1: Requirements Formulation (`product_manager`)
+     - Phase 2: Architectural Modeling & Trade-off ADRs (`system_architect`)
+     - Phase 3: Adversarial TDD & Red-Phase Verification (`adversarial_sdet`)
+     - Phase 4: Idiomatic Core Implementation (`core_engineer`)
+     - Phase 5: Mutation Testing & Security Hardening (`mutation_auditor`)
+     - Phase 6: Cognitive Dossier & Triple-Doc Sync (`technical_writer`)
+     - Phase 7: Packaging & Release Gating (`adversarial_sdet` / Release Gate)
+     - Phase 8: Post-Production Impact & Telemetry Analysis (`deep_research_specialist`)
+   - **Mandatory Pre-Flight Auto-Trigger**: Product Manager automatically triggers Deep Research Specialist on any new project, problem statement, or theme even if not explicitly requested in the user prompt.
+   - **Fail-Closed Frontend Gate**: If frontend files exist, headless Playwright verification is strictly required (rejects builds with exit code 1 if tests are missing or broken).
+4. **Brownfield Ingestion & Delta Resumption Engine**:
+   - **Completed Projects (Scenario A)**: Ingests legacy codebases, conducts a 5-pillar health audit (Architecture, Tests, AppSec, Cloud Economics, Anti-Tamper), and emits an Executive Improvement Matrix in `docs/audits/`.
+   - **Developing Projects (Scenario B)**: Auto-heals broken stubs (`NotImplementedError`, `TODO`, failing tests), formulates a Delta Work Breakdown Structure in `docs/plans/`, freezes baseline behavior with Characterization tests, and resumes development via TDD.
 5. **Universal Task Dispatcher Subsystems**:
    - **Task 1: Solution Formulation** (`--task solution`): First-principles dynamic synthesis, multi-hop live research triangulation, 4-moat defensibility matrix, and cloud COGS financial modeling.
    - **Task 2: Code Implementation** (`--task code`): Process sandbox jail, extreme edge-case fuzzing, 5-pass autonomous self-healing TDD loop.
    - **Task 3: Presentation Pitch Synthesis** (`--task presentation`): OmniDeck 2D Flex/Grid solver, 7 visual primitives, high-fidelity UI mockups (browser chrome, mobile HUD, 2x2 matrix), and cross-platform PDF export.
-   - **Task 4: Enterprise Audit & Remediation** (`--task audit`): Automated 5-pillar health audit and auto-healing of legacy codebases.
-6. **Distributed Domain Lease Locking**:
-   - Atomic file/domain leases in `.agents/state/locks/<domain>.lock.json` managed via `scripts/lock-manager.ts` (with optional Supabase CloudHttpDriver).
-7. **Strict Anti-Hallucination & Supply Chain Shield**:
+   - **Task 4: Enterprise Audit & Brownfield Ingestion** (`--task audit`): Automated 5-pillar health audit and auto-healing of legacy codebases.
+   - **Task 5: In-Progress Project Resumption** (`--task continue`): Baseline stabilization and delta feature build via TDD.
+   - **Task 6: Deep Research Triangulation** (`--task research`): Multi-hop exploration across 4 modes (`EXPLORATION`, `FEASIBILITY`, `DIAGNOSTIC`, `IMPACT`) powered by Jina Reader (`r.jina.ai`), DuckDuckGo, Semantic Scholar, and arXiv APIs with a minimum 120-second deliberation timer.
+   - **Task 7: Post-Production Impact Analysis** (`--task impact`): Standardized telemetry and impact dossiers grounded in real testing metrics (Playwright, Pytest, Mutation, SAST).
+6. **Distributed Domain Lease Locking & Mesh Coordination**:
+   - Atomic file/domain leases in `.agents/state/locks/<domain>.lock.json` managed via `scripts/lock-manager.ts` (with optional Supabase CloudHttpDriver or local LAN sync server).
+7. **Universal Multi-Harness Sync & Standard MCP Server**:
+   - Compiles authoritative rules from `AGENTS.md` into 6 native formats: `CLAUDE.md`, `.cursorrules`, `.cursor/rules/agentic-workflow.mdc`, `.windsurfrules`, `.github/copilot-instructions.md`, and `CODEX.md` via `npm run harness:sync`.
+   - Exposes orchestrator tools via standard JSON-RPC Model Context Protocol server (`npm run mcp:start`).
+8. **Deterministic AST Mutation Testing (≥ 80% Kill Rate)**:
+   - Dual-engine AST fault injection: Python native AST (`python_mutation_tester.py`) and TypeScript (`mutation-tester.ts`).
+   - Injects boundary inversions, boolean flips, arithmetic mutations, and return overrides with atomic `.bak` rollback on process interrupts.
+9. **Strict Anti-Hallucination & Supply Chain Shield**:
    - Zero ghost packages tolerated. Automated AST scanning (`scripts/anti-hallucination-checker.ts`) against `package.json` and standard library built-ins.
-8. **Token Economy & Progressive Disclosure**:
-   - 298 on-demand modular skills dynamically discovered via `skill-finder.ts`. Prevents context window saturation through targeted bounded file reading.
-9. **Dual-Persistence Memory Vault**:
-   - Plain-text git-mergeable JSONL (`.agents/memory/vault/records.jsonl`) paired with local SQLite FTS5 database (`.agents/memory/vault.sqlite`) for ultra-fast full-text search.
-10. **Autonomous Dynamic Red-Team DAST (Styx)**:
-    - Multi-agent simulated hacker mesh attacks live container sandboxes with Proof-of-Exploit (PoE) verification before code merges.
-11. **Mandatory Chat Prompt 6-Persona Execution Lifecycle**:
-    - In Antigravity IDE chat interactions, generic unstructured responses are forbidden. Every prompt visibly cycles through Product Manager, System Architect, Adversarial SDET, Core Engineer, Mutation Auditor, and Technical Writer.
-12. **Operator Empirical Proof Protocol (Squad Attestation)**:
-    - Eliminates hallucinated test/security claims. Every response concludes with a cryptographically signed execution receipt ([scripts/orchestrator/squad_attestation.py](file:///scripts/orchestrator/squad_attestation.py)) logged to SQLite Memory Vault (`npm run attest:verify`).
+10. **Token Economy & Progressive Disclosure**:
+    - 298 on-demand modular skills dynamically discovered via `skill-finder.ts`. Prevents context window saturation through targeted bounded file reading.
+11. **Dual-Persistence Memory Vault**:
+    - Plain-text git-mergeable JSONL (`.agents/memory/vault/records.jsonl`) paired with local SQLite FTS5 database (`.agents/memory/vault.sqlite`) for ultra-fast full-text search.
+12. **Mandatory 3-Gate Pre-Commit Barrier & Operator Attestation Receipt**:
+    - `.git/hooks/pre-commit` enforces fail-closed checks on secrets, zero-LaTeX markdown compliance, and AST anti-hallucination before every commit. Every response concludes with a verifiable cryptographic execution receipt logged to SQLite Memory Vault (`npm run attest:verify`).
+
+---
+
+## 🛠️ Prerequisites & One-Command Setup
+
+- **Node.js**: v20.x or v24.x LTS (with native `--experimental-strip-types`)
+- **Python**: 3.11+ or 3.12+
+- **Playwright**: Headless Chromium browser automation
+
+```bash
+# 1. Install Node.js dependencies
+npm install
+
+# 2. Install Playwright browser binaries
+npx playwright install chromium
+
+# 3. Verify System Readiness (All 7 Probes Green)
+npm run readiness
+```
 
 ---
 
@@ -196,18 +230,19 @@ npm run pentest
 │   ├── plans/ (INDEX.md)            # Feature PRDs & implementation plans
 │   ├── walkthroughs/ (INDEX.md)     # End-of-turn execution records & proofs
 │   ├── audits/ (INDEX.md)           # System readiness & adversarial audits
-│   ├── adrs/ (INDEX.md)             # Architecture Decision Records
+│   ├── decisions/ (INDEX.md)        # Enterprise Architecture Decisions
 │   ├── research/ (INDEX.md)         # Multi-hop research triangulation dossiers
-│   ├── rfcs/ (INDEX.md)             # API contracts, data models & state machines
+│   ├── specifications/ (INDEX.md)   # API contracts, data models & state machines
+│   ├── architecture/                # Production architecture blueprints
 │   └── dossiers/                    # Human operator cognitive dossiers
 ├── scripts/                         # Standalone operational tools
 │   ├── orchestrator/                # Universal Task Dispatcher engine
-│   │   ├── task_dispatcher.py       # Core CLI router for all 4 tasks
-│   │   ├── squad_orchestrator.py    # 6-role agile squad engine
+│   │   ├── task_dispatcher.py       # Core CLI router for all orchestrator tasks
+│   │   ├── squad_orchestrator.py    # 6+1 persona agile squad engine (9-phase SDLC)
 │   │   ├── spec_sync.py             # 6-class document persistence engine
 │   │   ├── python_mutation_tester.py# Native Python AST mutation injector
 │   │   ├── solution_council.py      # Dynamic first-principles solution engine
-│   │   └── research_triangulator.py # Multi-hop statutory & market researcher
+│   │   └── research_triangulator.py # 4-mode deep research & impact engine (Jina Reader, 120s deliberation)
 │   ├── engine/                      # OmniDeck presentation compiler
 │   │   ├── deck_dispatcher.py       # Slide generator and geometry solver
 │   │   └── render_bridge.py         # Cross-platform PPTX & PDF exporter
@@ -215,11 +250,10 @@ npm run pentest
 │   ├── anti-hallucination-checker.ts# AST import & package.json validator
 │   ├── mutation-tester.ts           # TypeScript AST mutation runner
 │   ├── token-budget-guard.ts        # Real-time token monitor & brake
-│   └── pen-test-runner.ts           # Strix/Styx dynamic penetration test runner
+│   └── security-audit-runner.ts     # Strix/Styx dynamic security audit runner
 ├── AGENTS.md                        # Root workspace-wide behavioral invariants
 ├── GEMINI.md                        # Operational pairing guidelines
 ├── SYSTEM_COMMANDS.md               # Master CLI & Agentic Command Cheat Sheet
-├── implementation_setup_guide.md    # The Definitive Production Blueprint
 └── specs/                           # Golden presentation and test contracts
 ```
 
@@ -231,11 +265,11 @@ npm run pentest
   - [Implementation Plans Index](docs/plans/INDEX.md)
   - [Walkthroughs Index](docs/walkthroughs/INDEX.md)
   - [Audits Index](docs/audits/INDEX.md)
-  - [Architecture Decision Records Index](docs/adrs/INDEX.md)
+  - [Architecture Decisions Index](docs/decisions/INDEX.md)
   - [Deep Research Dossiers Index](docs/research/INDEX.md)
-  - [Formal RFCs & Schemas Index](docs/rfcs/INDEX.md)
+  - [Specifications & Contracts Index](docs/specifications/INDEX.md)
 - **Comprehensive Guides**:
-  - **[The Master Implementation Guide](implementation_setup_guide.md)**: Exhaustive architectural guide covering workflow topologies, graduated autonomy, database migrations, Styx DAST, and the 2-person collaboration runbook.
+  - **[Master Production Architecture Blueprint](docs/architecture/production_architecture_blueprint.md)**: Exhaustive 3,000-line architectural guide covering workflow topologies, graduated autonomy, database migrations, Styx DAST, and the multi-operator collaboration runbook.
   - **[Master Command Cheat Sheet](SYSTEM_COMMANDS.md)**: CLI and prompt commands for all tasks.
   - **[Comprehensive System Audit](docs/audits/2026-09-21_agentic_workflow_comprehensive_audit.md)**: Stress test analysis of 15 enterprise subsystems and their remediations.
 

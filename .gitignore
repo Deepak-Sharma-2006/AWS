@@ -48,3 +48,33 @@ specs/*.html
 # Playwright artifacts
 test-results/
 playwright-report/
+
+# Workspace & local developer overrides
+.vscode/
+
+# Local SIH solutions (never committed to template)
+docs/sih_solutions/
+
+# Local SQLite databases and write-ahead logs
+*.sqlite
+*.sqlite-journal
+*.db
+*.db-wal
+*.db-shm
+
+# Ephemeral runtime locks and local audit trail
+*.lock.json
+.agents/state/locks/
+.agents/audit_trail.log
+
+# Ephemeral test run audits and plans
+docs/audits/*_test_*.md
+docs/audits/*_tamper_*.md
+docs/audits/*_casec_*.md
+docs/audits/*_remed_*.md
+docs/audits/*_sec_*.md
+docs/audits/*_ts_*.md
+docs/audits/*_audit_audit.md
+docs/plans/*_test_*.md
+docs/plans/*_casec_test_*.md
+

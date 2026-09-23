@@ -67,7 +67,7 @@
 - **Failure Path**: A developer introduces an uncontrolled input or breaks state persistence across tabs.
 - **Fail-Closed Guarantee**:
   - Playwright's `console` listener intercepts `Uncaught TypeError` or React warnings.
-  - The E2E suite verifies that navigating Stage 1 $\rightarrow$ 2 $\rightarrow$ 3 $\rightarrow$ 4 $\rightarrow$ 5 $\rightarrow$ 1 retains input wallet addresses and computed scores (Rule 13). If state resets, the test fails with exit code 1.
+  - The E2E suite verifies that navigating Stage 1 → 2 → 3 → 4 → 5 → 1 retains input wallet addresses and computed scores (Rule 13). If state resets, the test fails with exit code 1.
 
 ---
 

@@ -9,9 +9,8 @@ export function installGitHooks(): boolean {
   }
 
   const preCommitHook = `#!/bin/sh
-# Antigravity Autonomous Pre-Commit Shield: Zero-Secret & Anti-Hallucination Gate
-echo "🔒 [Pre-Commit Gate] Verifying zero secrets in staged changes..."
-
+# Antigravity Autonomous Pre-Commit Shield: Zero-Secret, Zero-LaTeX & Anti-Hallucination Gate
+echo "🔒 [Pre-Commit Gate 1/3] Verifying zero secrets in staged changes..."
 node --experimental-strip-types scripts/secret-scanner.ts --staged
 if [ $? -ne 0 ]; then
   echo "🛑 [COMMIT REJECTED] Secret scanner detected forbidden secrets in staged diff!"
@@ -19,7 +18,23 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "✅ [Pre-Commit Gate] Secret check passed."
+echo "📝 [Pre-Commit Gate 2/3] Verifying Zero-LaTeX compliance across markdown documentation..."
+node --experimental-strip-types scripts/markdown-linter.ts docs
+if [ $? -ne 0 ]; then
+  echo "🛑 [COMMIT REJECTED] Markdown linter detected raw LaTeX delimiters ($ or $$)!"
+  echo "Replace raw LaTeX with clean Unicode typography (>=, <=, x, !=, ->, +-) or fenced code blocks."
+  exit 1
+fi
+
+echo "🛡️ [Pre-Commit Gate 3/3] Verifying Zero Ghost Packages & AST import grounding..."
+node --experimental-strip-types scripts/anti-hallucination-checker.ts scripts src tests browser_tests
+if [ $? -ne 0 ]; then
+  echo "🛑 [COMMIT REJECTED] Anti-hallucination scanner detected undeclared package imports!"
+  echo "Declare all third-party dependencies in package.json before committing."
+  exit 1
+fi
+
+echo "✅ [Pre-Commit Barrier Complete] All 3 enterprise gates passed with zero violations."
 exit 0
 `;
 
@@ -32,7 +47,7 @@ exit 0
     // Windows may ignore chmod
   }
 
-  console.log(`✅ [Git Hook Installed] Pre-commit zero-secret barrier installed at: ${hookPath}`);
+  console.log(`✅ [Git Hook Installed] Pre-commit 3-gate barrier installed at: ${hookPath}`);
   return true;
 }
 

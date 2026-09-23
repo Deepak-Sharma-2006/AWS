@@ -14,6 +14,7 @@ Tests:
 import os
 import sys
 import json
+import time
 import unittest
 import shutil
 
@@ -40,8 +41,12 @@ class TestSquadOrchestrator(unittest.TestCase):
             shutil.rmtree(self.test_dir, ignore_errors=True)
 
     def test_persona_profiles_configured(self):
-        """Verifies that all 6 personas have differentiated temperature and reasoning effort."""
-        self.assertEqual(len(SQUAD_PERSONA_PROFILES), 6)
+        """Verifies that all 7 personas have differentiated temperature and reasoning effort."""
+        self.assertEqual(len(SQUAD_PERSONA_PROFILES), 7)
+
+        research = SQUAD_PERSONA_PROFILES["deep_research_specialist"]
+        self.assertEqual(research.temperature, 0.3)
+        self.assertEqual(research.reasoning_effort, "high")
         
         pm = SQUAD_PERSONA_PROFILES["product_manager"]
         self.assertEqual(pm.temperature, 0.7)
@@ -176,7 +181,83 @@ class TestTautological(unittest.TestCase):
         self.assertGreaterEqual(res["mutation_score"], 80.0)
         self.assertIn("product_manager", res["persona_profiles"])
         self.assertIn("adversarial_sdet", res["persona_profiles"])
+        self.assertIn("deep_research_specialist", res["persona_profiles"])
+
+    def test_deep_research_specialist_and_modes(self):
+        """Verifies ResearchTriangulator executes in EXPLORATION and IMPACT modes."""
+        from scripts.orchestrator.research_triangulator import ResearchTriangulator
+        
+        # Test EXPLORATION mode
+        exp_res = ResearchTriangulator.triangulate(
+            problem_title="Unit Test Exploration",
+            domain="Testing",
+            mode="EXPLORATION"
+        )
+        self.assertEqual(exp_res.mode, "EXPLORATION")
+        self.assertGreaterEqual(exp_res.saturation_score, 0.85)
+        self.assertTrue(len(exp_res.angles_analyzed) >= 3)
+        self.assertTrue(len(exp_res.defensible_moats) >= 1)
+
+        # Test IMPACT mode
+        impact_metrics = {
+            "playwright_latency": "12ms",
+            "e2e_pass_rate": "100%",
+            "pytest_coverage": "98.2%",
+            "mutation_kill_rate": "100%",
+            "sast_vulnerabilities": 0
+        }
+        imp_res = ResearchTriangulator.triangulate(
+            problem_title="Unit Test Impact",
+            domain="Testing",
+            mode="IMPACT",
+            empirical_metrics=impact_metrics
+        )
+        self.assertEqual(imp_res.mode, "IMPACT")
+        self.assertGreaterEqual(imp_res.saturation_score, 0.85)
+
+    def test_product_manager_mandatory_auto_trigger_research(self):
+        """Verifies Product Manager automatically triggers Deep Research on new problem statements."""
+        spec = ProductManagerRole.create_functional_spec(
+            prompt="Build high-speed telemetry engine for drones",
+            feature_name="drone_telemetry",
+            output_dir=self.test_dir,
+            auto_trigger_research=True
+        )
+        self.assertEqual(spec.feature_name, "drone_telemetry")
+        # Check that research dossier was persisted in docs/research/
+        research_dossier = os.path.join("docs", "research", f"{time.strftime('%Y-%m-%d')}_drone_telemetry_research.md")
+        self.assertTrue(os.path.exists(research_dossier))
+
+    def test_system_architect_significant_tradeoff_adr(self):
+        """Verifies System Architect emits to docs/decisions/ when significant trade-off occurs."""
+        spec = ProductManagerRole.create_functional_spec(
+            prompt="Migrate central database to distributed SQLite",
+            feature_name="db_migration",
+            output_dir=self.test_dir,
+            auto_trigger_research=False
+        )
+        # 1. Routine feature: No ADR emitted
+        contract_routine = SystemArchitectRole.design_contract(
+            spec,
+            output_dir=self.test_dir,
+            is_significant_tradeoff=False
+        )
+        self.assertIsNotNone(contract_routine)
+
+        # 2. Significant Trade-Off: ADR emitted
+        contract_significant = SystemArchitectRole.design_contract(
+            spec,
+            output_dir=self.test_dir,
+            is_significant_tradeoff=True,
+            tradeoff_rationale="Evaluated Postgres vs SQLite; chose SQLite for sub-50ms local zero-cloud latency."
+        )
+        self.assertIsNotNone(contract_significant)
+        adr_file = os.path.join("docs", "decisions", f"{time.strftime('%Y-%m-%d')}_db_migration_decision.md")
+        # Support both _decision.md and _adr.md naming
+        alt_adr_file = os.path.join("docs", "decisions", f"{time.strftime('%Y-%m-%d')}_db_migration_adr.md")
+        self.assertTrue(os.path.exists(adr_file) or os.path.exists(alt_adr_file))
 
 
 if __name__ == "__main__":
+    import time
     unittest.main()

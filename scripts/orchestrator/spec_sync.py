@@ -2,12 +2,12 @@
 In-Repo Universal Specification & Documentation Synchronizer
 Solves the Ephemeral Artifact Defect and Multi-Machine Memory Silo:
 1. Mirrors all IDE brain artifacts and reports into permanent, version-controlled git directories:
-   - docs/plans/        (Feature Implementation Plans)
-   - docs/walkthroughs/ (Execution Walkthroughs & Test Proofs)
-   - docs/audits/       (Adversarial Pentests & System Readiness Audits)
-   - docs/adrs/         (Architecture Decision Records)
-   - docs/research/     (Multi-Hop Research Triangulation Dossiers)
-   - docs/rfcs/         (Formal API & Data Model Contracts)
+   - docs/plans/          (Feature Implementation Plans)
+   - docs/walkthroughs/   (Execution Walkthroughs & Test Proofs)
+   - docs/audits/         (Adversarial Security Audits & System Readiness)
+   - docs/decisions/      (Enterprise Architecture Decisions)
+   - docs/research/       (Multi-Hop Research Triangulation Dossiers)
+   - docs/specifications/ (Formal API & Data Model Contracts)
 2. Maintains living INDEX.md catalogs in each directory.
 3. Dual-persists to SQLite Memory Vault and git-mergeable append-only JSONL (.agents/memory/vault/records.jsonl).
 """
@@ -46,10 +46,10 @@ DOCUMENT_CONFIGS: Dict[str, Dict[str, str]] = {
         "index_title": "Enterprise Audit Documentation Index",
         "description": "Permanent records of adversarial pentests, code audits, and system readiness."
     },
-    "adr": {
-        "dir": "docs/adrs",
-        "kind": "ADR",
-        "index_title": "Architecture Decision Records (ADRs)",
+    "decision": {
+        "dir": "docs/decisions",
+        "kind": "Decision",
+        "index_title": "Enterprise Architecture Decisions",
         "description": "Permanent records of fundamental architectural choices, trade-offs, and moats."
     },
     "research": {
@@ -58,12 +58,30 @@ DOCUMENT_CONFIGS: Dict[str, Dict[str, str]] = {
         "index_title": "Enterprise Deep Research Dossiers",
         "description": "Multi-hop research triangulation on statutory mandates, competitor benchmarks, and CVEs."
     },
-    "rfc": {
-        "dir": "docs/rfcs",
-        "kind": "RFC",
-        "index_title": "Requests for Comments & Contract Specifications",
+    "specification": {
+        "dir": "docs/specifications",
+        "kind": "Specification",
+        "index_title": "Contract & Interface Specifications",
         "description": "Formal typed interface schemas, state machine models, and API definitions."
     }
+}
+
+DOC_TYPE_ALIASES: Dict[str, str] = {
+    "adr": "decision",
+    "adrs": "decision",
+    "decision": "decision",
+    "decisions": "decision",
+    "rfc": "specification",
+    "rfcs": "specification",
+    "specification": "specification",
+    "specifications": "specification",
+    "plan": "plan",
+    "plans": "plan",
+    "walkthrough": "walkthrough",
+    "walkthroughs": "walkthrough",
+    "audit": "audit",
+    "audits": "audit",
+    "research": "research"
 }
 
 
@@ -80,7 +98,7 @@ class SpecSync:
         content: str,
         title: Optional[str] = None
     ) -> str:
-        doc_type_clean = doc_type.lower().strip()
+        doc_type_clean = DOC_TYPE_ALIASES.get(doc_type.lower().strip(), doc_type.lower().strip())
         config = DOCUMENT_CONFIGS.get(doc_type_clean)
         if not config:
             raise ValueError(f"Unknown document type '{doc_type}'. Supported: {list(DOCUMENT_CONFIGS.keys())}")
@@ -119,16 +137,26 @@ class SpecSync:
         return cls.persist_document("audit", name, content, title)
 
     @classmethod
+    def persist_decision(cls, name: str, content: str, title: Optional[str] = None) -> str:
+        return cls.persist_document("decision", name, content, title)
+
+    @classmethod
     def persist_adr(cls, name: str, content: str, title: Optional[str] = None) -> str:
-        return cls.persist_document("adr", name, content, title)
+        """Backward-compatible alias for persist_decision."""
+        return cls.persist_decision(name, content, title)
 
     @classmethod
     def persist_research(cls, name: str, content: str, title: Optional[str] = None) -> str:
         return cls.persist_document("research", name, content, title)
 
     @classmethod
+    def persist_specification(cls, name: str, content: str, title: Optional[str] = None) -> str:
+        return cls.persist_document("specification", name, content, title)
+
+    @classmethod
     def persist_rfc(cls, name: str, content: str, title: Optional[str] = None) -> str:
-        return cls.persist_document("rfc", name, content, title)
+        """Backward-compatible alias for persist_specification."""
+        return cls.persist_specification(name, content, title)
 
     @classmethod
     def get_all_indexes(cls) -> Dict[str, Dict[str, Any]]:

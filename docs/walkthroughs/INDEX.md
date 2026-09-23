@@ -11,3 +11,4 @@
 - **2026-09-21 01:16** | [Audit Trail](2026-09-21_audit_trail_walkthrough.md) | *Feature: Audit Trail*
 - **2026-09-21 01:16** | [Audit Trail](2026-09-21_audit_trail_walkthrough.md) | *Feature: Audit Trail*
 - **2026-09-21 01:46** | [Master Platform Architecture & Production Readiness Walkthrough](2026-09-21_platform_overhaul_walkthrough.md) | *Feature: platform_overhaul*
+- **2026-09-23 07:44** | [Phase Dossier: audit_probe](2026-09-23_audit_probe_walkthrough.md) | *Scope: audit_probe*

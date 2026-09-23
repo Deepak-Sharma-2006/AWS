@@ -146,13 +146,13 @@ if __name__ == "__main__":
             print(f" - [{r[0]}] {r[1][:16]}... : {r[2][:50]}")
     else:
         sample_cmds = [
-            {"cmd": "npx playwright test e2e/chakra.spec.ts", "exit_code": 0, "status": "VERIFIED_PASS", "duration": "2.4s"},
+            {"cmd": "npx playwright test browser_tests/chakra.spec.ts", "exit_code": 0, "status": "VERIFIED_PASS", "duration": "2.4s"},
             {"cmd": "pytest demo/ --cov=demo -q", "exit_code": 0, "status": "VERIFIED_PASS", "duration": "3.44s"},
             {"cmd": "bandit -r demo/ -ll -q", "exit_code": 0, "status": "VERIFIED_PASS", "duration": "0.8s"}
         ]
         res = SquadAttestor.record_attestation(
             prompt=args.prompt,
-            active_personas=["Product Manager", "System Architect", "Adversarial SDET", "Core Engineer", "Mutation Auditor", "Technical Writer"],
+            active_personas=["Deep Research Specialist", "Product Manager", "System Architect", "Adversarial SDET", "Core Engineer", "Mutation Auditor", "Technical Writer"],
             executed_commands=sample_cmds
         )
         print(SquadAttestor.format_receipt_markdown(res))

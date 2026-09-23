@@ -76,7 +76,7 @@ Mandate       : Independent Adversarial Probes, Chaos Fuzzing, AppSec & Release
   let p5Ok = true;
   let p5Details = "Zero unverified exploits detected";
   try {
-    execSync("node --experimental-strip-types scripts/pen-test-runner.ts", { stdio: "inherit" });
+    execSync("node --experimental-strip-types scripts/security-audit-runner.ts", { stdio: "inherit" });
   } catch {
     p5Ok = false;
     p5Details = "Penetration test exploit detected";

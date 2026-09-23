@@ -35,7 +35,7 @@
 4. **Distributed Lease Locking & Multi-Domain Concurrency**:
    - Developers acquire exclusive domain leases via `npm run lock:acquire --domain <name>`.
    - Independent domains (e.g. `core` and `adversarial`) can be developed concurrently without collisions.
-   - Phase handoffs (`npm run role:handoff`) atomically transfer domain leases, enforce zero-secret scans, and invert roles on phase advancement ($N \rightarrow N+1$).
+   - Phase handoffs (`npm run role:handoff`) atomically transfer domain leases, enforce zero-secret scans, and invert roles on phase advancement (N → N+1).
 
 ---
 
@@ -46,7 +46,7 @@
 2. **The 6-Technique Structure**:
    - Technique 1: The Human Mental Model (Plain-language purpose & boundary).
    - Technique 2: Visual Code Flow (ASCII / Mermaid call graph).
-   - Technique 3: Variable Lifecycle Trace (Birth $\rightarrow$ Transformation $\rightarrow$ Egress).
+   - Technique 3: Variable Lifecycle Trace (Birth → Transformation → Egress).
    - Technique 4: Non-Blocking Noise Filtering (Bypassing telemetry/logging on Pass 1).
    - Technique 5: Audit Exactly One Failure Path (Account enumeration & timing differential checks).
    - Technique 6: 1-Sentence Feynman Compression Test.
@@ -58,7 +58,7 @@
 1. **Progressive Disclosure & Skill Search**:
    - Do NOT load massive raw documentation or all skills into prompt context. Search skills dynamically via `npm run skill:search` or `scripts/skill-finder.ts`. Read only relevant sections using bounded file reading (`StartLine`/`EndLine`).
 2. **Slice-Targeted File Reading**:
-   - Avoid reading files $>150$ lines in their entirety. Use `grep_search` to locate target line numbers, then view the specific slice.
+   - Avoid reading files > 150 lines in their entirety. Use `grep_search` to locate target line numbers, then view the specific slice.
 3. **Hard Loop Limits & Model Saturation**:
    - Max 5 auto-correction loops per task.
    - Respect model-specific context thresholds via `npm run token:budget`. If context saturation exceeds 70%, trigger context reduction, suppress verbose command outputs, and offload facts to Memory Vault.
@@ -120,9 +120,12 @@
    - Human-facing documentation (`implementation_plan.md`, `walkthrough.md`, phase dossiers) must use clear, universally-rendering native Markdown diagrams (ASCII/Unicode box-drawing, workflow pipelines), structured data tables, and benchmark matrices.
 2. **Zero Resource Waste & Zero Broken Image Icons**:
    - Do NOT waste system resources generating external image files for markdown documents.
-   - Never embed fragile local image paths (`![Caption](...)`) that risk failing to render or displaying broken image icons in markdown viewers.
+   - Never embed fragile local image paths (`![Caption]` syntax) that risk failing to render or displaying broken image icons in markdown viewers.
 3. **Executive Visual Design Hierarchy**:
    - Documentation must be styled as C-level Enterprise Engineering Deliverables: sleek typography, executive summary cards, comparative capability matrix tables, verified empirical benchmarks, and clear operational commands.
+4. **Mandatory Zero-Raw-LaTeX Invariant**:
+   - All human-facing and living markdown documents across the entire workspace (including `implementation_plan.md`, `walkthrough.md`, phase dossiers, and all files under `docs/`) are strictly prohibited from using raw LaTeX math delimiters (single-dollar or double-dollar math syntax).
+   - All mathematical expressions, bounds, percentages, and formulas must use clean, universally rendering Unicode typography (`≥`, `≤`, `×`, `≠`, `→`, `≈`, `±`, `²`, `³`, `α`, `β`, `Δt`) or fenced code blocks. Verified fail-closed by `npm run lint:markdown`.
 
 ---
 
@@ -157,8 +160,8 @@
 
 1. **Mandatory Red-Phase Pre-Flight Verification**:
    - Tests MUST be written FIRST by the Adversarial SDET before feature implementation begins.
-   - The test must be executed against stubs/missing code and verified **RED (Exit code $\ne 0$)**. Any test that passes immediately without business logic is classified as a **Tautological Test Defect** and rejected.
-2. **Deterministic Mutation Testing Gate ($\ge 80\%$ Kill Rate)**:
+   - The test must be executed against stubs/missing code and verified **RED (Exit code ≠ 0)**. Any test that passes immediately without business logic is classified as a **Tautological Test Defect** and rejected.
+2. **Deterministic Mutation Testing Gate (≥ 80% Kill Rate)**:
    - All modules must be audited by the Mutation Testing Engine (`npm run test:mutation`).
    - The engine injects 4 fault classes:
      1. Boundary inversions (`>` to `<=`, `===` to `!==`).
@@ -220,7 +223,7 @@
      - 📐 **`[System Architect]`**: Define/verify typed data contracts, schemas, and FSM transition constraints.
      - 🛑 **`[Adversarial SDET]`**: Formulate red-phase acceptance criteria. Whenever frontend code exists, ALWAYS execute headless Playwright tests (`npm run test:e2e` or `npx playwright test`) with exhaustive elemental assertions.
      - 💻 **`[Core Engineer]`**: Write/refactor clean, production-grade business logic and UI components to turn tests green.
-     - 🔬 **`[Mutation & Security Auditor]`**: Verify mutation survivability ($\ge 80\%$), check zero secrets, constant-time checks, and fail-closed gates.
+     - 🔬 **`[Mutation & Security Auditor]`**: Verify mutation survivability (≥ 80%), check zero secrets, constant-time checks, and fail-closed gates.
      - 📑 **`[Technical Writer]`**: Generate/update living documentation, Part 7 dossiers, and sync plans/walkthroughs.
 2. **Universal Headless Playwright Mandate for Frontend**:
    - For all frontend projects in the workspace (`demo/chakra_mvp`, `demo/bhedak_mvp`, and any new web application), automated testing MUST execute via headless Playwright (`@playwright/test`) by default.
@@ -233,11 +236,24 @@
    - In chat responses, the agent is strictly forbidden from claiming any test passed, build succeeded, or security gate cleared without executing the real command and printing the exact command line and return code.
    - Every prompt response must conclude with the **Verifiable Squad Attestation Receipt** emitted by `SquadAttestor` ([scripts/orchestrator/squad_attestation.py](file:///scripts/orchestrator/squad_attestation.py)), containing timestamp, provenance SHA-256 hash, active personas, and verified executed commands.
    - Attestations are permanently logged to `.agents/audit_trail.log` and SQLite memory vault, verifiable by the operator via `npm run attest:verify`.
-5. **Automatic Triple-Documentation Sync Invariant**:
-   - Whenever any component, CLI command, testing harness, persona lifecycle, or architectural directive of the agentic workflow is modified, the agent MUST automatically assess the impact and update the three primary system documentation files without waiting for explicit operator instructions:
-     1. `SYSTEM_COMMANDS.md`: Master CLI command cheat sheet.
-     2. `README.md`: High-level system overview, architectural pillars, and quickstarts.
-     3. `implementation_setup_guide.md`: The definitive in-depth production architectural blueprint.
+5. **Automatic Twin-Documentation Sync Invariant**:
+   - Whenever any component, CLI command, testing harness, persona lifecycle, or architectural directive of the agentic workflow is modified, the agent MUST automatically assess the impact and synchronize the two primary system documentation files without waiting for explicit operator instructions:
+     1. `README.md`: High-level system overview, architectural pillars, onboarding prerequisites, and quickstarts.
+     2. `SYSTEM_COMMANDS.md`: Master executable CLI command cheat sheet.
+   - Deep architectural treatises and reference blueprints are maintained permanently in `docs/architecture/` (`docs/architecture/production_architecture_blueprint.md`).
+   - Living feature artifacts are version-controlled in `docs/plans/`, `docs/walkthroughs/`, `docs/audits/`, `docs/decisions/`, `docs/research/`, and `docs/specifications/` via `SpecSync`.
+
+---
+
+## 16. Mandatory Human-Naming Invariant & Root Compactness Standard
+
+1. **Human-Meaningful Naming (Zero Cryptic Acronyms)**:
+   - All files and directories across the entire repository MUST use clear, standard, human-meaningful English words.
+   - Strictly prohibit obscure abbreviations, truncated slang, and cryptic acronyms for files and directories (e.g. use `docs/decisions/` instead of `docs/adrs/`, `docs/specifications/` instead of `docs/rfcs/`, `scripts/security-audit-runner.ts` instead of `pen-test-runner.ts`, and `npm run verify:plan` instead of `peav:verify`).
+   - File and folder names must be concise (2 to 3 words maximum), avoiding runaway compound names. Use kebab-case for TypeScript/web assets and snake_case for Python modules.
+2. **Compact Root Directory Invariant**:
+   - The repository root must remain pristine and compact (≤ 12 essential files: `package.json`, `package-lock.json`, `tsconfig.json`, `playwright.config.ts`, `pytest.ini`, `.gitignore`, `.env.example`, `LICENSE`, `README.md`, `SYSTEM_COMMANDS.md`, `AGENTS.md`, and `GEMINI.md`).
+   - Tool-specific agent configurations must be placed in dedicated subdirectories (`.claude/`, `.cursor/rules/`, `.windsurf/`, `.codex/`, `.github/`). Loose harness or spell check files in root are strictly prohibited.
 
 
 

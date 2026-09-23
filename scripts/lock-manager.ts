@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 export interface DomainLease {
   domain: string;
   operator: string;
-  role: "Alpha" | "Beta";
+  role: string; // "Alpha" | "Beta" | "DomainLead" | "SDETLead" | custom
   acquiredAt: string;
   expiresAt: string;
   ttlSeconds: number;
@@ -34,17 +34,31 @@ function ensureLocksDir(): void {
 
 const ROLE_FILE = join(process.cwd(), ".agents/state/active-role.json");
 
-export function isSoloMode(): boolean {
-  if (process.env.OPERATOR_MODE === "solo") return true;
+export type OperatingMode = "solo" | "dual" | "team";
+
+export function getOperatingMode(): OperatingMode {
+  if (process.env.OPERATOR_MODE === "solo") return "solo";
+  if (process.env.OPERATOR_MODE === "team" || process.env.OPERATOR_MODE === "mesh") return "team";
+  if (process.env.OPERATOR_MODE === "dual") return "dual";
   if (existsSync(ROLE_FILE)) {
     try {
       const data = JSON.parse(readFileSync(ROLE_FILE, "utf-8"));
-      return data.mode === "solo";
+      if (data.mode === "solo" || data.mode === "dual" || data.mode === "team" || data.mode === "mesh") {
+        return data.mode === "mesh" ? "team" : data.mode;
+      }
     } catch {
-      return false;
+      return "dual";
     }
   }
-  return false;
+  return "dual";
+}
+
+export function isSoloMode(): boolean {
+  return getOperatingMode() === "solo";
+}
+
+export function isTeamMode(): boolean {
+  return getOperatingMode() === "team";
 }
 
 export function resolveOperator(explicitOperator?: string): string {
@@ -57,8 +71,12 @@ export function resolveOperator(explicitOperator?: string): string {
   if (process.env.OPERATOR_NAME && process.env.OPERATOR_NAME.trim()) {
     return process.env.OPERATOR_NAME.trim();
   }
+  try {
+    const gitUser = execSync("git config user.name", { encoding: "utf-8" }).trim();
+    if (gitUser) return gitUser;
+  } catch {}
   const host = hostname();
-  return host || "Computer1";
+  return host || "Developer";
 }
 
 /**
@@ -164,7 +182,7 @@ export class LocalGitDriver implements LockDriver {
 
   list(): DomainLease[] {
     ensureLocksDir();
-    const files = readdirSync(LOCKS_DIR).filter((f) => f.endsWith(".lock.json"));
+    const files = readdirSync(LOCKS_DIR).filter((f: string) => f.endsWith(".lock.json"));
     const leases: DomainLease[] = [];
     const now = new Date();
 
@@ -304,7 +322,7 @@ export function getLockDriver(driverName?: string): LockDriver {
 }
 
 // Top-level API (Backwards-compatible)
-export function acquireLock(domain: string, explicitOperator?: string, role: "Alpha" | "Beta" = "Alpha", ttlSeconds = 7200, driverName?: string): boolean {
+export function acquireLock(domain: string, explicitOperator?: string, role: string = "Alpha", ttlSeconds = 7200, driverName?: string): boolean {
   const driver = getLockDriver(driverName);
   const operator = resolveOperator(explicitOperator);
   const host = hostname();
@@ -337,7 +355,7 @@ export function releaseLock(domain: string, explicitOperator?: string, driverNam
   return driver.release(domain, operator);
 }
 
-export function transferLock(domain: string, fromOperator: string, toOperator: string, newRole: "Alpha" | "Beta" = "Alpha", driverName?: string): boolean {
+export function transferLock(domain: string, fromOperator: string, toOperator: string, newRole: string = "Alpha", driverName?: string): boolean {
   console.log(`🔄 [Phase Handoff] Transferring domain '${domain}' from '${fromOperator}' to '${toOperator}' (${newRole})...`);
   releaseLock(domain, fromOperator, driverName);
   return acquireLock(domain, toOperator, newRole, 7200, driverName);
@@ -375,7 +393,7 @@ if (isMain) {
   const rawArgs = process.argv.slice(2);
   const command = (rawArgs[0] && !rawArgs[0].startsWith("--") ? rawArgs[0] : "status").toLowerCase();
   const flags = parseCliFlags(rawArgs);
-  const positional = rawArgs.filter((a) => !a.startsWith("--") && a !== command);
+  const positional = rawArgs.filter((a: string) => !a.startsWith("--") && a !== command);
   const driverFlag = flags["driver"] || (flags["cloud"] ? "cloud" : undefined);
 
   if (command === "status") {
@@ -386,7 +404,8 @@ if (isMain) {
   } else if (command === "acquire") {
     const domain = flags["domain"] || positional[0] || "core";
     const op = flags["operator"] || flags["op"] || positional[1];
-    const role = ((flags["role"] || positional[2] || "Alpha") as "Alpha" | "Beta");
+    const defaultRole = isTeamMode() ? "DomainLead" : "Alpha";
+    const role = flags["role"] || positional[2] || defaultRole;
     acquireLock(domain, op, role, 7200, driverFlag);
   } else if (command === "heartbeat") {
     const domain = flags["domain"] || positional[0] || "core";
@@ -400,7 +419,7 @@ if (isMain) {
     const domain = flags["domain"] || positional[0] || "core";
     const fromOp = flags["from"] || positional[1] || "Computer1";
     const toOp = flags["to"] || positional[2] || "Computer2";
-    const role = ((flags["role"] || positional[3] || "Beta") as "Alpha" | "Beta");
+    const role = flags["role"] || positional[3] || (isTeamMode() ? "DomainLead" : "Beta");
     transferLock(domain, fromOp, toOp, role, driverFlag);
   } else {
     console.log(`

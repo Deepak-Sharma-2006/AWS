@@ -7,22 +7,25 @@ import { saveMemory } from "./memory-vault.ts";
 
 export interface ActiveRoleProfile {
   operator: string;
-  role: "Alpha" | "Beta";
+  role: string; // "Alpha" | "Beta" | "DomainLead" | custom
   roleTitle: string;
   phase: number;
   activeLeaseDomain: string;
   updatedAt: string;
-  mode?: "solo" | "dual";
+  mode?: "solo" | "dual" | "team";
 }
 
 const STATE_DIR = join(process.cwd(), ".agents/state");
 const ROLE_FILE = join(STATE_DIR, "active-role.json");
 
-function getRoleTitle(role: "Alpha" | "Beta", mode?: "solo" | "dual"): string {
+function getRoleTitle(role: string, mode?: string): string {
   if (mode === "solo") {
     return role === "Alpha"
       ? "Solo Enterprise Lead (Autonomous Alpha Architect)"
       : "Solo Enterprise Auditor (Autonomous Beta SDET)";
+  }
+  if (mode === "team" || mode === "mesh") {
+    return `Team Domain Lead (${role}) - Distributed Architecture Mesh`;
   }
   return role === "Alpha"
     ? "Feature Architect & Core Domain Lead"
@@ -109,10 +112,12 @@ export function printRoleMatrix(): void {
 ================================================================================`);
 }
 
-export function setOperatingMode(mode: "solo" | "dual"): boolean {
+export function setOperatingMode(mode: "solo" | "dual" | "team" | "mesh"): boolean {
   const profile = getActiveProfile();
-  profile.mode = mode;
-  if (mode === "solo") {
+  const normalizedMode = (mode === "mesh" ? "team" : mode) as "solo" | "dual" | "team";
+  profile.mode = normalizedMode;
+
+  if (normalizedMode === "solo") {
     profile.operator = "SoloOperator";
     profile.role = "Alpha";
     profile.roleTitle = getRoleTitle("Alpha", "solo");
@@ -122,6 +127,16 @@ export function setOperatingMode(mode: "solo" | "dual"): boolean {
     console.log(`   Autonomous Squad      : Enabled (PM, Architect, SDET, Coder, SecAuditor, TechWriter)`);
     console.log(`   Multi-Host Lease Lock : Bypassed (Single operator maintains full system control)`);
     console.log(`   Adversarial Gates     : Gated via autonomous Lead 2 SDET & Mutation Testing\n`);
+  } else if (normalizedMode === "team") {
+    profile.operator = resolveOperator();
+    profile.role = "DomainLead";
+    profile.roleTitle = getRoleTitle("DomainLead", "team");
+    saveProfile(profile);
+    console.log(`\n🌐 [OPERATING MODE: TEAM MESH ACTIVATED]`);
+    console.log(`   Operator Identity     : ${profile.operator}`);
+    console.log(`   Collaboration Model   : Multi-Developer Distributed Domain Leases (N-Persons)`);
+    console.log(`   Domain Locking        : Parallel independent domain leases (.agents/state/locks/<domain>.lock.json)`);
+    console.log(`   Cross-Device Sync     : Git-synced shared locks & SQLite JSONL memory replication\n`);
   } else {
     profile.operator = resolveOperator();
     profile.roleTitle = getRoleTitle(profile.role, "dual");
@@ -134,16 +149,47 @@ export function setOperatingMode(mode: "solo" | "dual"): boolean {
   return true;
 }
 
+export function printTeamStatus(): void {
+  const profile = getActiveProfile();
+  const currentHost = resolveOperator();
+  console.log(`
+================================================================================
+            N-PERSON TEAM MESH & ACTIVE LEASE ROSTER
+================================================================================
+  Operating Mode        : ${profile.mode ? profile.mode.toUpperCase() : "SOLO"}
+  Current Workstation   : ${currentHost}
+  Active Operator       : ${profile.operator}
+  Assigned Role         : ${profile.role} (${profile.roleTitle})
+================================================================================`);
+
+  console.log("\nActive Domain Leases across Team Workstations:");
+  const locks = listLocks();
+  if (locks.length === 0) {
+    console.log("  (No active domain leases held. Run 'npm run lock:acquire --domain <name>' to lease a domain.)");
+  } else {
+    for (const l of locks) {
+      console.log(`  - Domain: [${l.domain}] | Operator: ${l.operator} (${l.role}) | Host: ${l.host} | Expires: ${l.expiresAt}`);
+    }
+  }
+  console.log("================================================================================\n");
+}
+
 export function printRoleStatus(): void {
   const profile = getActiveProfile();
   const currentHost = resolveOperator();
   const mode = profile.mode || "solo";
 
+  const modeDescription = mode === "solo"
+    ? "Single Dev / Autonomous Squad"
+    : mode === "team"
+    ? "N-Person Team / Hackathon Mesh"
+    : "2-Person 50/50 Dual-Lead";
+
   console.log(`
 ================================================================================
                ACTIVE WORKSPACE ROLE & LEASE PROFILE
 ================================================================================
-  Operating Mode        : ${mode.toUpperCase()} (${mode === "solo" ? "Single Dev / Autonomous Squad" : "2-Person 50/50 Dual-Lead"})
+  Operating Mode        : ${mode.toUpperCase()} (${modeDescription})
   Current Workstation   : ${currentHost}
   Active Profile Leader : ${profile.operator}
   Assigned Role         : ${profile.role} (${profile.roleTitle})
@@ -320,14 +366,16 @@ if (isMain) {
   const rawArgs = process.argv.slice(2);
   const command = (rawArgs[0] && !rawArgs[0].startsWith("--") ? rawArgs[0] : "status").toLowerCase();
   const flags = parseCliFlags(rawArgs);
-  const positional = rawArgs.filter((a) => !a.startsWith("--") && a !== command);
+  const positional = rawArgs.filter((a: string) => !a.startsWith("--") && a !== command);
 
   if (command === "status") {
     printRoleStatus();
+  } else if (command === "team-status" || command === "roster" || command === "team") {
+    printTeamStatus();
   } else if (command === "mode") {
     const targetMode = (positional[0] || flags["set"] || "status").toLowerCase();
-    if (targetMode === "solo" || targetMode === "dual") {
-      setOperatingMode(targetMode);
+    if (targetMode === "solo" || targetMode === "dual" || targetMode === "team" || targetMode === "mesh") {
+      setOperatingMode(targetMode as any);
     } else {
       printRoleStatus();
     }
@@ -351,7 +399,8 @@ Usage: node --experimental-strip-types scripts/role-switch.ts <command> [options
 
 Commands:
   status               Display active operator, role title, phase, and domain lease
-  mode [solo|dual]     Toggle between Solo Dev (Autonomous Squad) and Dual-Lead modes
+  mode [solo|dual|team]Toggle between Solo Dev, Dual-Lead, and N-Person Team Mesh modes
+  team-status          Display active team roster, machines, and domain leases across laptops
   matrix               Display the enterprise 50/50 division of labor matrix
   alpha [domain] [op]  Acquire domain lease and set workstation as Lead 1 (Alpha)
   beta [domain] [op]   Configure workstation as Lead 2 (Beta) with Hardening Authority

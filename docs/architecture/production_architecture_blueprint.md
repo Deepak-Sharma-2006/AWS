@@ -1445,7 +1445,7 @@ The 6 techniques transform passive, linear scrolling into an active, graph-based
 
 #### 4. Skip What You Don't Need on the First Pass (Cognitive Gating)
 - **Concept**: Novices get trapped exploring every helper function, logger, and decorator on line 2.
-- **Action**: Intentionally step over rate-limiters, audit logging calls, and generic input santizers on Pass 1. Only drill down into helpers if they alter the request payload, abort the execution flow, or directly explain a detected bug.
+- **Action**: Intentionally step over rate-limiters, audit logging calls, and generic input sanitizers on Pass 1. Only drill down into helpers if they alter the request payload, abort the execution flow, or directly explain a detected bug.
 
 #### 5. Audit Exactly One Critical Failure Path (Security & Timing Checks)
 - **Concept**: The happy path proves the feature functions; the failure path proves whether it is secure.
@@ -2581,6 +2581,7 @@ The starting point of any hackathon problem statement or enterprise feature is g
    - Formulates the **10x White-Space Moat Thesis** (the core architectural breakthrough that makes the solution defensible to judges and technical evaluators).
 3. **Enterprise Native Visual Documentation**:
    - Replaces fragile external image files with clean, universally-rendering native Markdown diagrams (ASCII/Unicode box-drawing, workflow pipelines), structured data tables, and benchmark matrices.
+   - 🔬 **`[Mutation & Security Auditor]`**: AST mutation kill rate (≥ 80%), pre-commit secret scans, constant-time cryptography.
 4. **Memory Vault Persistence**:
    - Commits the architectural decision record (ADR) directly into `.agents/memory/vault.sqlite`.
 
@@ -2873,24 +2874,72 @@ The platform resolves this by implementing **Dual-Persistence Synchronization**:
 
 ---
 
-### 11.13 Mandatory Chat Prompt 6-Persona Execution Lifecycle & Operator Empirical Proof Protocol
+### 11.13 Mandatory Chat Prompt 6+1 Persona Execution Lifecycle & 9-Phase SDLC Architecture
 
 In interactive IDE chat sessions, agents naturally default to unstructured conversational generalists unless constrained by rigorous system rules. The platform introduces **Rule 15 of AGENTS.md** and **Rule 12 of GEMINI.md**:
 
-1. **Zero-Generalist Chat Mandate**:
-   Every chat prompt processed in Antigravity IDE must visibly execute through the 6 Enterprise Personas:
-   - 📋 **`[Product Manager]`**: Scope deconstruction, user journeys, forbidden states.
-   - 📐 **`[System Architect]`**: Typed schema contracts, FSM state machines, API endpoints.
-   - 🛑 **`[Adversarial SDET]`**: Red-first black-box test suites, headless Playwright verification.
-   - 💻 **`[Core Engineer]`**: Production logic implementation, TDD self-healing to green.
-   - 🔬 **`[Mutation & Security Auditor]`**: AST mutation kill rate ($\ge 80\%$), pre-commit secret scans, constant-time cryptography.
-   - 📑 **`[Technical Writer]`**: Part 7 comprehension dossiers, living documentation sync.
+#### 1. Complete 9-Phase Enterprise SDLC Mapping
 
-2. **Operator Empirical Proof Protocol (Squad Attestation)**:
-   - Handled autonomously by [`scripts/orchestrator/squad_attestation.py`](file:///scripts/orchestrator/squad_attestation.py).
-   - Every prompt execution records an immutable SHA-256 provenance signature into `.agents/memory/vault.sqlite` and `.agents/audit_trail.log`.
-   - Every response concludes with a verifiable YAML receipt containing real tool commands, exit codes, and timestamps.
-   - Operators verify the audit ledger anytime via `npm run attest:verify`.
+The squad operates across 9 deterministic phases to ensure complete software lifecycle coverage from conception through post-ship telemetry:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        THE 9-PHASE ENTERPRISE SDLC LIFECYCLE                           │
+├─────────┬───────────────────────────────┬────────────────────────────┬─────────────────┤
+│ Phase   │ Name                          │ Lead Persona               │ Primary Output  │
+├─────────┼───────────────────────────────┼────────────────────────────┼─────────────────┤
+│ Phase 0 │ Discovery & Deep Research     │ Deep Research Specialist   │ docs/research/  │
+│ Phase 1 │ Requirements Formulation      │ Product Manager            │ docs/plans/     │
+│ Phase 2 │ Architectural Modeling        │ System Architect           │ docs/rfcs/, adrs│
+│ Phase 3 │ Adversarial TDD (Red-Phase)   │ Adversarial SDET           │ tests/          │
+│ Phase 4 │ Idiomatic Implementation      │ Core Engineer              │ src/            │
+│ Phase 5 │ Mutation & AppSec Hardening   │ Mutation Auditor           │ specs/metrics   │
+│ Phase 6 │ Cognitive Dossier & Doc Sync  │ Technical Writer           │ docs/dossiers/  │
+│ Phase 7 │ Packaging & Release Gating    │ Adversarial SDET           │ release artifacts│
+│ Phase 8 │ Post-Ship Impact & Telemetry  │ Deep Research Specialist   │ docs/research/  │
+└─────────┴───────────────────────────────┴────────────────────────────┴─────────────────┘
+```
+
+#### 2. The 6+1 Agile Squad Personas & Zero-Generalist Chat Mandate
+
+Every chat prompt processed in Antigravity IDE must visibly execute through the designated Enterprise Personas:
+- 📋 **`[Product Manager]`**: Scope deconstruction, user journeys, forbidden states, acceptance criteria. **Mandatory Auto-Trigger**: Automatically triggers Phase 0 Deep Research whenever a new project, problem statement, or theme is provided, even if research was not explicitly requested.
+- 🔍 **`[Deep Research Specialist]`**: Autonomous 4-mode multi-hop web intelligence using 2025/2026 keyless free connectors (Jina Reader `r.jina.ai`, DuckDuckGo, Semantic Scholar, arXiv, NIST NVD). Deliberates for a minimum of 120 seconds, computing a saturation index before synthesizing evidence into `docs/research/`.
+- 📐 **`[System Architect]`**: Typed schema contracts, FSM state machines, API endpoints in `docs/rfcs/`. **ADR Gating**: Generates `docs/adrs/` Architecture Decision Records strictly when significant architectural trade-offs or irreversible structural decisions are made.
+- 🛑 **`[Adversarial SDET]`**: Red-first black-box test suites, boundary fuzzing, race-condition simulation, and mandatory headless Playwright browser verification whenever frontend files exist.
+- 💻 **`[Core Engineer]`**: Production logic implementation, autonomous red-to-green TDD self-healing loop.
+- 🔬 **`[Mutation & Security Auditor]`**: AST mutation kill rate (≥ 80%), pre-commit secret scans, constant-time cryptography (`crypto.timingSafeEqual`), and fail-closed gates.
+- 📑 **`[Technical Writer]`**: Part 7 6-technique cognitive dossiers, triple-documentation sync across `SYSTEM_COMMANDS.md`, `README.md`, and `implementation_setup_guide.md`.
+
+#### 3. Deep Research Specialist Architecture & 4 Operating Modes
+
+The Deep Research Specialist ([`scripts/orchestrator/research_triangulator.py`](file:///scripts/orchestrator/research_triangulator.py)) provides grounded real-world intelligence across 4 distinct operational modes:
+1. **`EXPLORATION` (Pre-Flight Discovery)**: Market landscape, statutory mandates, existing commercial solutions, and regulatory constraints before feature inception.
+2. **`FEASIBILITY` (Mid-Architecture Viability)**: Trade-off benchmarking, dependency licensing audits, RFC viability checks, and architectural boundary analysis.
+3. **`DIAGNOSTIC` (Bug Reproduction & Flaw Root-Cause)**: CVE lookups, GitHub issue tracking, upstream defect verification, and edge-case triangulation.
+4. **`IMPACT` (Post-Production Analysis)**: Telemetry synthesis, regression monitoring, real testing metrics aggregation (Playwright DOM tests, Pytest coverage, Mutation kill rates, SAST vulnerabilities), and field impact dossiers.
+
+#### 4. Saturation Index & Minimum Deliberation Time Budget
+
+To eliminate hasty, superficial web lookups, the Deep Research engine enforces a rigorous saturation index:
+
+```
+saturation_index = min(1.0, (unique_citations * 0.15) + (hops * 0.20) + (time_spent / 120.0))
+```
+
+- **Minimum Deliberation**: The engine deliberates for at least 120 seconds. If saturation remains below 0.85, the Operator Extension Gate prompts the user to grant an additional deliberation window before finalizing the dossier.
+- **Keyless Free Connectors**:
+  - `Jina Reader`: Clean markdown extraction from any web URL via `https://r.jina.ai/<URL>`.
+  - `DuckDuckGo`: Unauthenticated privacy-preserving multi-query web search.
+  - `Semantic Scholar & arXiv`: Academic peer-reviewed research papers and citation graphs.
+  - `NIST NVD`: CVE vulnerability database lookup for supply chain and infrastructure audits.
+
+#### 5. Operator Empirical Proof Protocol (Squad Attestation)
+
+- Handled autonomously by [`scripts/orchestrator/squad_attestation.py`](file:///scripts/orchestrator/squad_attestation.py).
+- Every prompt execution records an immutable SHA-256 provenance signature into `.agents/memory/vault.sqlite` and `.agents/audit_trail.log`.
+- Every response concludes with a verifiable YAML receipt containing real tool commands, exit codes, and timestamps.
+- Operators verify the audit ledger anytime via `npm run attest:verify`.
 
 ---
 
@@ -2898,7 +2947,7 @@ In interactive IDE chat sessions, agents naturally default to unstructured conve
 
 The platform standardizes on 100% free, industry-standard verification engines across all application tiers:
 - **Frontend E2E**: **Headless Playwright** (`@playwright/test`) with 60s timeout, Chrome DevTools Protocol (CDP) direct binding, and 100% DOM element assertions (`npm run test:e2e`).
-- **Backend Testing & Coverage**: **Pytest** with **pytest-cov** (`pytest demo/ --cov=demo -q`), measuring branch and statement coverage (maintained at $\ge 95\%$).
+- **Backend Testing & Coverage**: **Pytest** with **pytest-cov** (`pytest demo/ --cov=demo -q`), measuring branch and statement coverage (maintained at ≥ 95%).
 - **Static AppSec (SAST)**: **Bandit** (`bandit -r demo/ -ll -q`), scanning Python AST for insecure host bindings (CWE-605 `0.0.0.0`), unescaped inputs, and weak cryptographic primitives.
 - **Pre-Commit Secret Shield**: [`scripts/secret-scanner.ts`](file:///scripts/secret-scanner.ts) checking staged changes before every commit (`npm run check:secrets:staged`).
 
@@ -2910,4 +2959,102 @@ Whenever any component, CLI command, testing harness, persona lifecycle, or arch
 1. `SYSTEM_COMMANDS.md`: Master CLI command cheat sheet.
 2. `README.md`: High-level system overview, architectural pillars, and quickstarts.
 3. `implementation_setup_guide.md`: The definitive in-depth production architectural blueprint.
+
+---
+
+### 11.16 Brownfield Project Ingestion & Delta Resumption Architecture
+
+While greenfield projects start from blank specifications, real-world enterprise engineering and hackathon development require ingesting existing codebases. The platform addresses two distinct brownfield topologies:
+
+#### Scenario A: Completed Project Audit & Improvement Matrix
+When auditing an existing completed codebase:
+1. **Reconnaissance & AST Classification**: `ProjectAuditor.audit_project()` traverses the repository, detecting modules, packages, and existing test suites while ignoring build artifacts.
+2. **5-Pillar Diagnostic Evaluation**:
+   - *Pillar 1 (Architecture & Types)*: Evaluates cyclomatic complexity, type safety contracts, and unfinished stubs.
+   - *Pillar 2 (Edge-Case Test Probe Depth)*: Asserts whether test suites exist and cover edge cases (empty, boundary, malformed).
+   - *Pillar 3 (AppSec & Secret Invariants)*: Scans AST for hardcoded credentials, unescaped SQL/calldata, and CWE vulnerabilities.
+   - *Pillar 4 (Cloud Financial Unit Economics)*: Validates cloud COGS and ensures gross margins meet or exceed 75%.
+   - *Pillar 5 (Anti-Tamper & Cryptographic State)*: Checks for SHA-256 Merkle chain-of-custody and tamper-evident audit ledgers.
+3. **Living Output & Backlog PRD**: Emits an Executive Health Scorecard to `docs/audits/` and prompts the Product Manager to formulate an Improvement Backlog in `docs/plans/`.
+4. **Golden Master Characterization Testing**: Before applying refactoring patches, the Adversarial SDET freezes existing behavior with black-box characterization tests to guarantee zero regressions.
+
+#### Scenario B: Developing Project Onboarding & Delta Resumption
+When inheriting a half-built project:
+1. **Baseline Stabilization**: `ProjectAuditor.remediate_project()` identifies broken stubs (`NotImplementedError`, `TODO`, failing unit tests) and runs self-healing passes until existing baseline tests are 100% green.
+2. **Delta Work Breakdown Structure (WBS)**: Product Manager maps finished modules against target requirements, emitting a formal Delta WBS Implementation Plan to `docs/plans/`.
+3. **6+1 Squad Resumption**: System Architect aligns existing schemas with new contract interfaces (`docs/rfcs/`), and the squad executes standard Phase 3–8 TDD cycles on missing modules.
+
+---
+
+### 11.17 N-Person Team Mesh & Hackathon Synchronization Engine
+
+To scale beyond 2-person Alpha/Beta setups to hackathons and multi-developer squads (3 to 6+ engineers), the platform introduces **Team Mesh Mode (`mode: "team"`)**:
+
+#### 1. Dynamic Domain-Oriented Leases
+Work is partitioned by clean architectural domain boundaries rather than rigid binary roles:
+- Developer 1: `domain: "auth_service"`, `role: "DomainLead"`
+- Developer 2: `domain: "payment_engine"`, `role: "DomainLead"`
+- Developer 3: `domain: "frontend_ui"`, `role: "DomainLead"`
+- Developer 4: `domain: "system_security"`, `role: "SDETLead"`
+
+Because domain locks (`.agents/state/locks/<domain>.lock.json`) are disjoint, all N developers build simultaneously in parallel without write collisions.
+
+#### 2. Cross-Device Synchronization Options
+- **Git-Native Shared State (Zero-Cloud)**:
+  - Domain lock files and append-only SQLite memory logs (`.agents/memory/vault/records.jsonl`) commit and merge cleanly in Git across branches.
+  - Every `git pull --rebase` updates everyone's local FTS5 SQLite index automatically.
+- **Local LAN Sync Server (`scripts/lan-sync-server.ts`)**:
+  - In hackathon venues with restricted or spotty internet, one laptop runs the zero-dependency Node.js LAN server on port 4040.
+  - Teammates configure `export LOCK_WEBHOOK_URL="http://<HOST_IP>:4040"` for instant sub-10ms lock heartbeats and shared roster visibility (`npm run team:status`).
+
+---
+
+### 11.18 Universal Multi-Harness Instruction Sync & Standard MCP Server
+
+To eliminate configuration drift across disparate agent interfaces (Claude Code, Cursor, Windsurf, Copilot, Codex), the platform adheres to a strict single-source-of-truth model:
+
+#### 1. Universal Harness Compiler (`scripts/universal-harness-sync.ts`)
+The root `AGENTS.md` file serves as the definitive specification. Running `npm run harness:sync` compiles it into all target harness formats:
+- `CLAUDE.md`: Anthropic Claude Code CLI with project commands and 6+1 Persona directives.
+- `.cursorrules` & `.cursor/rules/agentic-workflow.mdc`: Cursor IDE rules.
+- `.windsurfrules`: Codeium Windsurf rules.
+- `.github/copilot-instructions.md`: GitHub Copilot Workspace.
+- `CODEX.md`: OpenAI Codex and Aider.
+
+#### 2. Model Context Protocol (MCP) Server (`scripts/mcp-server.ts`)
+Exposes the core orchestration capabilities over standard JSON-RPC stdio to any MCP-compliant client:
+- `orchestrator_solution`: Formulates first-principles solutions with live research.
+- `orchestrator_squad`: Drives 6+1 agile squad feature implementation.
+- `orchestrator_research`: Executes deep research across 4 modes with 120s deliberation.
+- `orchestrator_audit`: Audits completed projects or onboards developing codebases.
+- `orchestrator_team_status`: Inspects active team members and domain leases.
+- `orchestrator_attest`: Verifies the cryptographic execution provenance ledger.
+
+---
+
+### 11.19 Deterministic Multi-Model Fail-Closed Compliance
+
+System prompts alone cannot guarantee 100% compliance across diverse LLMs due to context window saturation and attention degradation. The platform enforces compliance using a **4-Layer Fail-Closed Defense**:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        THE 4-LAYER FAIL-CLOSED COMPLIANCE DEFENSE                      │
+├─────────┬───────────────────────────────┬──────────────────────────────────────────────┤
+│ Layer   │ Mechanism                     │ Enforcement Action                           │
+├─────────┼───────────────────────────────┼──────────────────────────────────────────────┤
+│ Layer 1 │ Git Pre-Commit Hook Barrier   │ Blocks commits with exit code 1 on secrets,  │
+│         │ (.git/hooks/pre-commit)       │ LaTeX delimiters, or undeclared imports.     │
+├─────────┼───────────────────────────────┼──────────────────────────────────────────────┤
+│ Layer 2 │ Schema Boundary Validation    │ Validates persona outputs against typed JSON │
+│         │ (PEAV Alignment Shield)       │ schemas; auto-triggers self-healing on drift.│
+├─────────┼───────────────────────────────┼──────────────────────────────────────────────┤
+│ Layer 3 │ Cryptographic Attestation     │ Mandates immutable SHA-256 execution ledger  │
+│         │ (SquadAttestor & SQLite)      │ records; rejects ungrounded verbal claims.   │
+├─────────┼───────────────────────────────┼──────────────────────────────────────────────┤
+│ Layer 4 │ Turn-Boundary Prompt Injection│ Injects 6+1 Persona structure reminders to   │
+│         │ (Hookify & Agent Harnesses)   │ eliminate long-context attention dilution.   │
+└─────────┴───────────────────────────────┴──────────────────────────────────────────────┘
+```
+
+Regardless of which model (Claude, GPT, Gemini, DeepSeek, or Qwen) or human engineer touches the code, violations cannot enter the codebase or pass CI/CD.
 
