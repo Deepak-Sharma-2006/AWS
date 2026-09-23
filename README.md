@@ -1,5 +1,5 @@
-# Enterprise 2-Person / 2-Computer Autonomous Agentic Engineering Platform
-### Built on Google Antigravity IDE & Antigravity CLI (`agy`)
+# Enterprise Multi-Persona Autonomous Agentic Engineering Platform
+### Built for Google Antigravity IDE & Antigravity CLI (`agy`)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B%20%7C%2080%2F80%20Pass-brightgreen.svg)](https://python.org/)
@@ -7,7 +7,7 @@
 [![Security DAST](https://img.shields.io/badge/Styx-AI%20Red--Team-red.svg)](https://github.com/styx-security)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-An enterprise-grade, production-hardened development platform and operational harness enabling **two engineers across two separate workstations** ("Computer 1" and "Computer 2") to build and deploy complex full-stack software autonomously using shared agentic context, distributed lease locks, anti-hallucination shields, native AST mutation testing, and adversarial multi-agent governance.
+An enterprise-grade, production-hardened development platform and operational harness supporting **Solo Operators**, **2-Person Dual-Lead rotations**, and **Multi-Developer Team Meshes (N persons)** to build, test, and deploy complex full-stack software autonomously using shared agentic context, distributed lease locks, anti-hallucination shields, native AST mutation testing, zero-process documentation hooks, live context window telemetry, and adversarial multi-agent governance.
 
 ---
 
@@ -88,6 +88,40 @@ npm run readiness
 
 ---
 
+## 🧑‍💻 Human Operator Quick-Start: Fresh Project Usage Guide
+
+When cloning this repository as a starter template for new projects:
+
+### 1. Clone & Initialize
+```bash
+git clone https://github.com/Deepak-Sharma-2006/script.git my-new-project
+cd my-new-project
+npm install
+```
+
+### 2. Verify Dual-Scope Scale
+```bash
+npm run project:scale
+# Output: 🟢 SMALL (<5k LOC) based on your src/ files
+```
+
+### 3. Check Active Context & Headroom
+```bash
+npm run context:check
+# Displays active post-compaction context tokens and compaction headroom
+```
+
+### 4. Synchronize Brain Artifacts (Zero Background Overhead)
+```bash
+npm run docs:sync
+# Sub-second turn-egress mirroring from IDE brain to docs/ catalogs
+```
+
+### 5. Start Fresh Chat Sessions Confidently
+Start each major feature phase in a new chat. The agent reads `docs/*/INDEX.md` and the latest walkthrough (~2,000 tokens) to re-ground immediately without re-ingesting stale conversation transcripts.
+
+---
+
 ## 🚀 Quickstart: Solo Operator Workflow
 
 ```bash
@@ -131,57 +165,53 @@ npm run docs:sync
 
 ---
 
-## 👥 Quickstart: 2-Person Dual Workstation Setup
+## 👥 Enterprise Collaboration: 2-Person Dual-Lead & Multi-Developer Team Mesh
 
-### Prerequisites
-- **Node.js**: v20.0+ LTS (Node 24 supported with `--experimental-strip-types`)
-- **Python**: v3.10+ (Standard library `ast`, `unittest`, `sqlite3`)
-- **Git**: v2.40+
-- **Docker Engine & Docker Compose**: For local sandbox testing
-- **Google Antigravity**: Antigravity IDE and/or CLI (`agy`)
+The platform natively supports three operational collaboration topologies:
+1. **Solo Operator Mode (`npm run mode:solo`)**: Single developer commanding the full 6-persona autonomous squad. Distributed locks are bypassed with zero collisions.
+2. **2-Person Dual-Lead Mode (`npm run mode:dual`)**: Symmetrical 50/50 dual-lead workflow alternating across Computer 1 (Alpha - Feature Architect) and Computer 2 (Beta - Adversarial Systems & SDET).
+3. **N-Person Team Mesh Mode (`npm run mode:team`)**: Distributed squad mesh where N developers concurrently lease independent domains (`auth`, `billing`, `frontend`, `analytics`) with local LAN sync (`npm run lan:start`) and automated Git merge reconciliation.
 
 ---
 
-### Workstation 1 (Computer 1) - Day 1 Setup
+### Workstation 1 (Computer 1: Lead 1 Alpha) — Day 1 Setup
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/Deepak-Sharma-2006/agent1.git
-cd agent1
+git clone https://github.com/Deepak-Sharma-2006/script.git my-project
+cd my-project
 
 # 2. Install dependencies & type definitions
 npm install
 
-# 3. Set Dual Mode & Verify Antigravity customization layer
+# 3. Set Dual Mode & verify environment readiness
 npm run mode:dual
 npm run check:hallucinations   # Zero ghost packages check
-npm run role:status            # Inspect active domain leases
-npm run harness:dynamic        # Validate 5/5 next-gen dynamic test contracts
+npm run lock:status            # Inspect active domain leases across workstations
 
-# 4. Acquire Phase 1 Lease (Alpha Builder Role)
-npm run role:alpha -- auth      # Atomically leases 'auth' domain to Computer 1
+# 4. Acquire domain lease for feature development (e.g. auth domain)
+npm run lock:acquire --domain auth
 ```
 
 ---
 
-### Workstation 2 (Computer 2) - Day 1 Setup
+### Workstation 2 (Computer 2: Lead 2 Beta) — Day 1 Setup
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/Deepak-Sharma-2006/agent1.git
-cd agent1
+git clone https://github.com/Deepak-Sharma-2006/script.git my-project
+cd my-project
 
 # 2. Install dependencies
 npm install
 
-# 3. Inspect active leases (Verify Computer 1 holds Phase 1 lease)
-npm run role:status
+# 3. Inspect active leases (Verify Computer 1 holds active lease on 'auth')
+npm run lock:status
 
-# 4. AI Security Penetration Testing (Strix/Styx)
-# Strix is installed via: pip install strix-agent
-npm run strix:quick            # Fast pre-flight DAST check
-# or run full pen-test suite:
-npm run pentest
+# 4. Run adversarial readiness and security baseline audits
+npm run audit:sast             # Bandit SAST security audit
+npm run test:backend           # Master pytest suite
+npm run test:e2e               # Headless Playwright browser verification
 ```
 
 ---
@@ -192,20 +222,47 @@ npm run pentest
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                             THE PHASE HANDOFF LIFECYCLE                                          │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 1. Computer 1 (Alpha) implements Phase 1 in Antigravity IDE / agy CLI.                           │
-│ 2. Computer 1 writes tests (Vitest/Python) & authors dossier: docs/dossiers/phase-1-auth.md.    │
-│ 3. SpecSync automatically saves plan & ADR into docs/plans/ and docs/adrs/.                      │
-│ 4. Computer 1 commits to feat/phase-1-auth and pushes to origin.                                 │
-│ 5. Computer 1 executes lease transfer:                                                           │
-│    npm run role:transfer -- auth Computer2 Beta                                                  │
-│ 6. Computer 2 (Beta) pulls branch, convenes Claude Council & runs Strix DAST:                    │
-│    npm run pentest   (or: npm run strix:deep)                                                    │
-│ 7. Computer 2 audits dossier, verifies zero timing attacks, and runs mutation tests.            │
-│ 8. Computer 2 merges feat/phase-1-auth into main and releases lock:                             │
-│    npm run role:release -- auth                                                                  │
+│ 1. Computer 1 (Alpha) implements Phase 1 features, unit tests, and architecture dossiers.       │
+│ 2. Brain artifacts are mirrored synchronously via zero-process turn-egress:                      │
+│    npm run docs:sync  (persists to docs/plans/ and docs/decisions/)                              │
+│ 3. Living catalogs are reconciled deterministically:                                             │
+│    npm run docs:reconcile                                                                        │
+│ 4. Computer 1 commits and pushes to origin:                                                      │
+│    git commit -m "feat(auth): phase 1 implementation" && git push origin main                     │
+│ 5. Computer 1 initiates atomic role handoff:                                                     │
+│    npm run role:handoff                                                                          │
+│ 6. Computer 2 (Beta) pulls branch, authors independent black-box adversarial tests in            │
+│    tests/adversarial/, runs AST mutation testing, and audits AppSec boundaries:                  │
+│    npm run test:mutation && npm run audit:beta                                                   │
+│ 7. Computer 2 applies direct hardening patches, verifies attestation ledger:                     │
+│    npm run attest:verify                                                                         │
+│ 8. Computer 2 releases domain lock and certifies release:                                        │
+│    npm run lock:release --domain auth                                                            │
 │ 9. ROLE INVERSION: Computer 2 now acquires Phase 2 as ALPHA; Computer 1 becomes BETA!            │
-│    (Computer 2 runs: npm run role:alpha -- payments)                                             │
+│    (Computer 2 runs: npm run lock:acquire --domain payments)                                     │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 🌐 N-Person Team Mesh Collaboration (Hackathons & Agile Squads)
+
+When expanding beyond 2 developers to N team members:
+```bash
+# 1. Activate Team Mesh mode on all workstations
+npm run mode:team
+
+# 2. Start local LAN sync server on host machine (or use cloud git locks)
+npm run lan:start
+
+# 3. Each developer acquires an independent domain lease concurrently:
+npm run lock:acquire --domain frontend    # Developer A
+npm run lock:acquire --domain billing     # Developer B
+npm run lock:acquire --domain ingestion   # Developer C
+
+# 4. Automated conflict-free living catalog merges:
+# Custom Git merge driver (merge.docs-index.driver) reconciles docs/**/INDEX.md automatically on git pull/merge.
+npm run docs:reconcile
 ```
 
 ---

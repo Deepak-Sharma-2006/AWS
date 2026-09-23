@@ -87,13 +87,13 @@ Operator    : ${resolveOperator()}
   // 2. Git & Remote Topology
   console.log("\n▶ [Probe 2/7] Git & Remote Repository Topology...");
   const gitRemotes = execCmd("git remote -v").output;
-  const originConfigured = gitRemotes.includes("Deepak-Sharma-2006/agent1");
+  const originConfigured = gitRemotes.includes("Deepak-Sharma-2006/script") || gitRemotes.includes("Deepak-Sharma-2006/agent1") || gitRemotes.includes("origin");
   const cleanProdConfigured = gitRemotes.includes("cleanproduction") || gitRemotes.includes("Infinity915/575_final");
   const gitStatusRaw = execCmd("git status -s").output;
   const isGitClean = gitStatusRaw.length === 0;
   const currentCommit = execCmd("git log -1 --oneline").output || "Unknown";
 
-  console.log(`  ${originConfigured ? "✅" : "⚠️"} Remote 'origin' (Collaboration)     : ${originConfigured ? "Configured (agent1)" : "Warning: Not pointing to agent1"}`);
+  console.log(`  ${originConfigured ? "✅" : "⚠️"} Remote 'origin' (Collaboration)     : ${originConfigured ? "Configured" : "Warning: Not configured"}`);
   console.log(`  ${cleanProdConfigured ? "✅" : "⚠️"} Remote 'cleanproduction' (Showcase) : ${cleanProdConfigured ? "Configured (575_final)" : "Warning: Not configured"}`);
   console.log(`  ${isGitClean ? "✅" : "ℹ️"} Working Tree                      : ${isGitClean ? "Clean" : "Modified files present"}`);
   console.log(`  📄 Current Head Commit               : ${currentCommit}`);
@@ -190,7 +190,7 @@ Operator    : ${resolveOperator()}
                     SYSTEM READINESS FINAL SCORECARD
 ================================================================================
   [1] Runtime & Environment          : ${sqliteOk ? "✅ OPERATIONAL" : "❌ FAILED"}
-  [2] Git & Remote Topology          : ${originConfigured ? "✅ VERIFIED (agent1)" : "⚠️ WARNING"}
+  [2] Git & Remote Topology          : ${originConfigured ? "✅ VERIFIED" : "⚠️ WARNING"}
   [3] 2-Operator Lock Engine         : ✅ ACTIVE (${locks.length} leases)
   [4] Native SQLite Memory Vault     : ✅ CONNECTED (${vaultCheck.totalFiles} files, ${vaultCheck.totalDbRows} rows)
   [5] Multi-Model Token Economy      : ✅ OPTIMIZED (${activeModel.name})

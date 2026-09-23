@@ -5,6 +5,40 @@
 
 ---
 
+## 0. Human Operator Quick-Start: Fresh Project Usage Guide
+
+When cloning this repository as a starter template for new projects:
+
+### 1. Clone & Initialize
+```bash
+git clone https://github.com/Deepak-Sharma-2006/script.git my-new-project
+cd my-new-project
+npm install
+```
+
+### 2. Verify Dual-Scope Scale
+```bash
+npm run project:scale
+# Output: 🟢 SMALL (<5k LOC) based on your src/ files
+```
+
+### 3. Check Active Context & Headroom
+```bash
+npm run context:check
+# Displays active post-compaction context tokens and compaction headroom
+```
+
+### 4. Synchronize Brain Artifacts (Zero Background Overhead)
+```bash
+npm run docs:sync
+# Sub-second turn-egress mirroring from IDE brain to docs/ catalogs
+```
+
+### 5. Start Fresh Chat Sessions Confidently
+Start each major feature phase in a new chat. The agent reads `docs/*/INDEX.md` and the latest walkthrough (~2,000 tokens) to re-ground immediately without re-ingesting stale conversation transcripts.
+
+---
+
 ## 1. Core Task Execution Commands
 
 ### Task 1: Solution Formulation, White-Space Moat & Cloud Unit Economics
