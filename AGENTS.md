@@ -253,7 +253,23 @@
    - File and folder names must be concise (2 to 3 words maximum), avoiding runaway compound names. Use kebab-case for TypeScript/web assets and snake_case for Python modules.
 2. **Compact Root Directory Invariant**:
    - The repository root must remain pristine and compact (≤ 12 essential files: `package.json`, `package-lock.json`, `tsconfig.json`, `playwright.config.ts`, `pytest.ini`, `.gitignore`, `.env.example`, `LICENSE`, `README.md`, `SYSTEM_COMMANDS.md`, `AGENTS.md`, and `GEMINI.md`).
-   - Tool-specific agent configurations must be placed in dedicated subdirectories (`.claude/`, `.cursor/rules/`, `.windsurf/`, `.codex/`, `.github/`). Loose harness or spell check files in root are strictly prohibited.
+   - Tool-specific agent configurations must be placed in dedicated subdirectories or unified in `UNIVERSAL_AGENT_INSTRUCTIONS.md`. Loose harness or spell check files in root are strictly prohibited.
+
+---
+
+## 17. Mandatory Real-Time Brain Artifact-to-Docs Synchronous Mirroring
+
+1. **Deterministic In-Repo Persistence**:
+   - Whenever the agent creates, edits, or updates an artifact (such as `implementation_plan.md`, `walkthrough.md`, or any diagnostic audit) in the IDE brain directory, the agent MUST immediately synchronize that file to its in-repo catalog (`docs/plans/`, `docs/walkthroughs/`, `docs/audits/`) using `SpecSync` (or `python -m scripts.orchestrator.spec_sync --sync-brain`).
+2. **Exact Real-Time Timestamping (Hours, Minutes, Seconds)**:
+   - All persisted markdown files MUST use full real-time timestamp prefixes down to the second (`YYYY-MM-DD_HH-MM-SS_<slug>_<type>.md`, e.g. `2026-09-23_09-38-33_browser_tests_human_naming_plan.md`). Date-only filenames (`YYYY-MM-DD`) are strictly prohibited to prevent collisions and preserve chronological precision.
+3. **Smart Human Title & Slug Extraction**:
+   - Filenames and index entries must dynamically derive clean, human-meaningful 2 to 4 word slugs from the primary document `# Heading`.
+4. **Autonomous Real-Time Watcher Daemon**:
+   - The repository provides `RealtimeDocsWatcher` (`npm run docs:watch` or `python -m scripts.orchestrator.realtime_docs_watcher`), which continuously monitors the active brain folder using SHA-256 change detection to auto-sync any modified artifacts within 1.5 seconds.
+5. **Living Catalog Deduplication**:
+   - `INDEX.md` living catalogs in all 6 directories (`docs/plans/`, `docs/walkthroughs/`, `docs/audits/`, `docs/decisions/`, `docs/research/`, `docs/specifications/`) must record the exact second of execution (`YYYY-MM-DD HH:MM:SS`) and prevent duplicate line appends.
+
 
 
 

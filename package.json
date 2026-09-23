@@ -33,6 +33,8 @@
     "verify:plan": "python -m scripts.orchestrator.plan_execution_verifier",
     "peav:verify": "npm run verify:plan",
     "spec:sync": "python -m scripts.orchestrator.spec_sync",
+    "docs:sync": "python -m scripts.orchestrator.spec_sync --sync-brain",
+    "docs:watch": "python -m scripts.orchestrator.realtime_docs_watcher",
     "test:consistency": "python -m scripts.orchestrator.consistency_checker",
     "research:triangulate": "python -m scripts.orchestrator.research_triangulator",
     "mode:solo": "node --experimental-strip-types scripts/role-switch.ts mode solo",

@@ -179,6 +179,22 @@ python -m scripts.orchestrator.task_dispatcher --task memory --query "Satellite"
 npm run memory:doctor
 ```
 
+### Real-Time Documentation Synchronization & Watcher Daemon
+Automatically synchronizes IDE brain conversation artifacts (implementation plans, walkthroughs, diagnostic audits) into in-repo catalogs with real-time timestamps (min & sec).
+
+```bash
+# 1. Real-time background watcher daemon (monitors active brain folder continuously)
+npm run docs:watch
+python -m scripts.orchestrator.realtime_docs_watcher
+
+# 2. One-shot synchronous mirror of active brain artifacts
+npm run docs:sync
+python -m scripts.orchestrator.spec_sync --sync-brain
+
+# 3. Print living documentation catalog status across all 6 document classes
+python -m scripts.orchestrator.spec_sync --all-indexes
+```
+
 ### Pre-Commit Secret Scanning & AppSec Red-Teaming
 ```bash
 # Scan all staged git files for leaked secrets/tokens before committing
