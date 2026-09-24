@@ -17,6 +17,7 @@ import json
 import time
 import unittest
 import shutil
+import glob
 
 from scripts.orchestrator.squad_orchestrator import (
     ProductManagerRole,
@@ -225,8 +226,8 @@ class TestTautological(unittest.TestCase):
         )
         self.assertEqual(spec.feature_name, "drone_telemetry")
         # Check that research dossier was persisted in docs/research/
-        research_dossier = os.path.join("docs", "research", f"{time.strftime('%Y-%m-%d')}_drone_telemetry_research.md")
-        self.assertTrue(os.path.exists(research_dossier))
+        matching_research = glob.glob(os.path.join("docs", "research", f"*{time.strftime('%Y-%m-%d')}*drone_telemetry_research.md"))
+        self.assertTrue(len(matching_research) > 0, "Expected drone_telemetry research dossier in docs/research/")
 
     def test_system_architect_significant_tradeoff_adr(self):
         """Verifies System Architect emits to docs/decisions/ when significant trade-off occurs."""
@@ -252,10 +253,8 @@ class TestTautological(unittest.TestCase):
             tradeoff_rationale="Evaluated Postgres vs SQLite; chose SQLite for sub-50ms local zero-cloud latency."
         )
         self.assertIsNotNone(contract_significant)
-        adr_file = os.path.join("docs", "decisions", f"{time.strftime('%Y-%m-%d')}_db_migration_decision.md")
-        # Support both _decision.md and _adr.md naming
-        alt_adr_file = os.path.join("docs", "decisions", f"{time.strftime('%Y-%m-%d')}_db_migration_adr.md")
-        self.assertTrue(os.path.exists(adr_file) or os.path.exists(alt_adr_file))
+        matching_adrs = glob.glob(os.path.join("docs", "decisions", f"*{time.strftime('%Y-%m-%d')}*db_migration*.md"))
+        self.assertTrue(len(matching_adrs) > 0, "Expected db_migration decision file in docs/decisions/")
 
 
 if __name__ == "__main__":

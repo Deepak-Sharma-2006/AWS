@@ -78,3 +78,6 @@ docs/audits/*_audit_audit.md
 docs/plans/*_test_*.md
 docs/plans/*_casec_test_*.md
 
+# Large Competition Datasets (> 100MB rejected by GitHub)
+AWS_dataset/
+
