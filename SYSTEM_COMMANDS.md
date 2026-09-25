@@ -11,7 +11,7 @@ When cloning this repository as a starter template for new projects:
 
 ### 1. Clone & Initialize
 ```bash
-git clone https://github.com/Deepak-Sharma-2006/script.git my-new-project
+git clone https://github.com/Deepak-Sharma-2006/AWS.git my-new-project
 cd my-new-project
 npm install
 ```
@@ -424,13 +424,13 @@ npm run token:budget                          # Displays token budget usage and 
 Production ML pipeline commands for large-scale Business Entity Resolution (1.73M entities) and Unstop platform browser submission automation.
 
 ```bash
-# 1. Execute Full Test Inference (Entity Resolution across 1.73M test records)
+# 1. Execute Iteration 2 Multi-Attribute Test Inference (Joint Name + Address, 1.73M entities)
 python scripts/run_test_inference.py
-# Generates matching_results.tsv (154.48 MB, 1,732,544 rows, TSV format)
+# Generates matching_results.tsv and candidate_pairs.tsv with spatial guardrails & singleton protection
 
-# 2. Verify Output TSV Format & Schema Compliance
+# 2. Verify Output TSV Format & Subsumption Invariant
 python scripts/verify_matching_tsv_format.py
-# Asserts: 1,732,544 rows, correct tab delimiter, non-empty matches, candidate subset invariant
+# Asserts: 1,732,544 rows, correct tab delimiter, M ⊆ C subset invariant, zero duplicates
 
 # 3. Execute Official Amazon ML Challenge Validation Suite
 python AWS_dataset/student_resource/utils/validate_submission.py

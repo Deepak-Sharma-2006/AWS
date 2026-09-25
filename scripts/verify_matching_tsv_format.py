@@ -1,6 +1,6 @@
 import os
 
-p = "matching_results.tsv"
+p = "output/matching_results.tsv" if os.path.exists("output/matching_results.tsv") else "matching_results.tsv"
 
 print("=" * 70)
 print("     FORMAT VERIFICATION: matching_results.tsv VS PROBLEM STATEMENT")

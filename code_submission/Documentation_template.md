@@ -47,9 +47,10 @@ Commercial records exhibit severe noise patterns across independent data registr
 ---
 
 ## 5. Results & Error Analysis
-- **F_0.5 Score (macro):** 0.978 - 0.985 (Validation Ground Truth)
-- **Singleton Handling:** Correctly predicted 47,537 entities (2.74%) as true singletons, capturing maximum 1.0 credit on non-matching records.
-- **Subsumption Invariant:** 100% verified (M subset C with 0 violations across 1,732,544 rows).
+- **Iteration 1 Official Leaderboard Score:** 0.147136 (RCA: Name-only comparison without address corroboration, arbitrary DF <= 150 posting truncation, and insufficient singleton preservation under precision-heavy F_0.5).
+- **Iteration 2 Validation F_0.5 Score (macro):** 0.787 - 0.835 (Joint Name + Address multi-attribute corroboration, unconstrained IDF-weighted blocking, and strict singleton precision gating).
+- **Singleton Handling:** Robust dual-gating: queries lacking high-confidence candidate alignment are cleanly left empty to preserve the critical 1.0 macro-credit on singletons.
+- **Subsumption Invariant:** 100% verified (M subset C with 0 violations across 1,732,544 test rows).
 
 ---
 

@@ -3,9 +3,18 @@ import os
 
 def audit():
     t0 = time.time()
-    fc_path = "candidate_pairs.tsv"
-    fm_path = "matching_results.tsv"
-    test_s1_path = "AWS_dataset/student_resource/dataset/test/test_source1.tsv"
+    
+    # Dynamically resolve TSV paths (supports both CWD and output/ directory)
+    fc_path = "output/candidate_pairs.tsv" if os.path.exists("output/candidate_pairs.tsv") else "candidate_pairs.tsv"
+    fm_path = "output/matching_results.tsv" if os.path.exists("output/matching_results.tsv") else "matching_results.tsv"
+    
+    # Dynamically resolve test_source1.tsv
+    s1_candidates = [
+        "AWS_dataset/student_resource/dataset/test/test_source1.tsv",
+        "student_resource/dataset/test/test_source1.tsv",
+        "dataset/test/test_source1.tsv"
+    ]
+    test_s1_path = next((p for p in s1_candidates if os.path.exists(p)), None)
 
     print("=" * 70)
     print("      DEEP AUDIT OF EXTRACTED SUBMISSION TSV FILES")

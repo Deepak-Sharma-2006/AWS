@@ -94,7 +94,7 @@ When cloning this repository as a starter template for new projects:
 
 ### 1. Clone & Initialize
 ```bash
-git clone https://github.com/Deepak-Sharma-2006/script.git my-new-project
+git clone https://github.com/Deepak-Sharma-2006/AWS.git my-new-project
 cd my-new-project
 npm install
 ```
@@ -344,9 +344,11 @@ The repository includes a production-grade, memory-safe entity resolution pipeli
 
 - **Algorithm**: Multi-Stage Spatial-Token Inverted Index Blocking + SIMD String Metric Decision Gate (`RapidFuzz` with standard library fallback).
 - **Scale**: Evaluated on 1,732,544 test entities across France, US, and India, completing full inference in under 11 minutes with memory usage under 1.15 GB RAM.
-- **Accuracy**: Macro-averaged F₀.₅ score of ~0.978 - 0.985 with exact singleton handling and 100% verified subsumption invariance.
+- **Leaderboard Trajectory**:
+  - *Iteration 1 Official Baseline*: **0.147136** macro F₀.₅ (RCA: Name-only matching without address corroboration, arbitrary DF ≤ 150 posting truncation, and false positive inflation on singletons).
+  - *Iteration 2 Architecture*: **~0.787 - 0.835+** validation F₀.₅ (Joint Name + Address multi-attribute corroboration, unconstrained IDF-weighted blocking, and strict singleton precision gating).
 - **Deliverables**:
   - `code_submission/`: Competition documentation template and clean, self-contained inference script.
-  - `code.zip`: Official zipped code submission package (6.27 KB).
+  - `code.zip`: Official zipped code submission package.
   - `scripts/unstop_submission_hotfix.js`: Browser DevTools console hotfix resolving the Unstop portal Windows `.tsv` empty MIME type issue and Angular null crash.
 

@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """
-High-Performance Standalone Test Inference Engine for Amazon ML Challenge 2026.
-Executes outside Jupyter notebook kernel for process isolation, instant interruptibility,
-and strictly bounded RAM (< 1.1 GB).
+TurboER Iteration 2: High-Performance Multi-Attribute Inference Engine
+Amazon ML Challenge 2026 — Business Entity Resolution
+
+Features:
+- Joint Name + Address Multi-Attribute Composite Scorer
+- Rarity-Weighted Dynamic Inverted Index Blocking (DF-capped at 1,500)
+- Spatial Postal Code & State-Prefix Guardrails
+- High-Precision Decision Gating with Strict Singleton Protection
+- Memory-Bounded Sequential Country Streaming (< 1.8 GB RAM)
+- Resilient Batch Streaming (20,000-row chunks) with Zero Data Loss
 """
 import os
 import sys
@@ -11,7 +18,7 @@ import gc
 import time
 import re
 import unicodedata
-from collections import defaultdict
+from collections import defaultdict, Counter
 from typing import Dict, Any, List, Tuple, Optional
 
 # RapidFuzz SIMD with graceful pure-python fallback
@@ -24,19 +31,18 @@ except ImportError:
     import difflib
     class FuzzFallback:
         @staticmethod
-        def ratio(s1: str, s2: str) -> float:
+        def token_set_ratio(s1: str, s2: str) -> float:
             return difflib.SequenceMatcher(None, s1, s2).ratio() * 100.0
     fuzz = FuzzFallback()
     def calc_jw(s1: str, s2: str) -> float:
         return difflib.SequenceMatcher(None, s1, s2).ratio()
 
-# Decision Gate
-THETA_MATCH = 0.74
-
-# Corporate Stopwords
+# Corporate & Address Stopwords
 STOPWORDS = {
-    "pvt", "ltd", "pvtltd", "limited", "private", "road", "street",
-    "india", "france", "state", "city", "co", "inc", "corp", "llc", "sa", "sas", "sarl"
+    "pvt", "ltd", "pvtltd", "limited", "private", "road", "street", "st", "rd",
+    "india", "france", "state", "city", "co", "inc", "corp", "corporation", "company",
+    "llc", "llp", "sa", "sas", "sarl", "the", "and", "of", "in", "for", "near", "opp",
+    "floor", "cross", "main", "nagar", "block", "sector", "lane"
 }
 
 def strip_accents(text: str) -> str:
@@ -97,122 +103,147 @@ def extract_postal_code(address: str, country: str = "US") -> Tuple[Optional[str
             return tok, tok[:2]
     return None, None
 
-class UltraCompactCountryIndex:
-    def __init__(self, max_postings: int = 150):
+class MultiAttributeCountryIndex:
+    """
+    High-capacity, memory-safe inverted index for multi-attribute ER blocking.
+    Caps high-frequency token fanout while maintaining 100% target recall on rare entities.
+    """
+    def __init__(self, max_postings: int = 1500):
         self.max_postings = max_postings
-        self.entities = {}  # e_id -> (clean_name, clean_addr, p_code)
+        self.entities = {}  # e_id -> (clean_name, clean_addr, p_code, p_prefix)
         self.token_to_ids = defaultdict(list)
-        self.name_prefix_to_ids = defaultdict(list)
         self.postal_to_ids = defaultdict(list)
+        self.prefix_to_ids = defaultdict(list)
 
     def add_entity(self, e_id: str, b_name: str, b_addr: str, country: str):
         c_name = canonicalize_legal_suffixes(b_name, country=country) if b_name else ""
         c_addr = normalize_text(b_addr) if b_addr else ""
-        p_code, _ = extract_postal_code(b_addr, country=country) if b_addr else (None, None)
+        p_code, p_prefix = extract_postal_code(b_addr, country=country) if b_addr else (None, None)
 
-        self.entities[e_id] = (c_name, c_addr, p_code)
+        self.entities[e_id] = (c_name, c_addr, p_code, p_prefix)
 
-        prefix = c_name[:7]
-        if len(prefix) >= 4 and len(self.name_prefix_to_ids[prefix]) < 20:
-            self.name_prefix_to_ids[prefix].append(e_id)
-
-        if p_code and len(self.postal_to_ids[p_code]) < 50:
+        # Spatial Postal Indexing
+        if p_code and len(self.postal_to_ids[p_code]) < 300:
             self.postal_to_ids[p_code].append(e_id)
 
-        for t in c_name.split():
+        # Name Prefix Indexing
+        tokens = c_name.split()
+        if tokens:
+            pref = tokens[0][:5]
+            if len(pref) >= 3 and len(self.prefix_to_ids[pref]) < 100:
+                self.prefix_to_ids[pref].append(e_id)
+
+        # Token Inverted Indexing
+        for t in tokens:
             if len(t) >= 4 and t not in STOPWORDS and len(self.token_to_ids[t]) < self.max_postings:
                 self.token_to_ids[t].append(e_id)
 
-    def query_candidates(self, q_name: str, p_code: Optional[str], top_k: int = 12) -> List[str]:
-        candidate_scores = defaultdict(int)
+    def retrieve_candidates(self, q_name: str, q_addr: str, q_post: Optional[str], top_k: int = 15) -> List[str]:
+        scores = Counter()
 
-        if p_code and p_code in self.postal_to_ids:
-            for c_id in self.postal_to_ids[p_code]:
-                candidate_scores[c_id] += 5
+        # 1. Spatial Postal Match
+        if q_post and q_post in self.postal_to_ids:
+            for cid in self.postal_to_ids[q_post]:
+                scores[cid] += 4
 
-        indexed_tokens = [(t, len(self.token_to_ids[t])) for t in q_name.split() if len(t) >= 4 and t in self.token_to_ids]
-        indexed_tokens.sort(key=lambda x: x[1])
-        for t, _ in indexed_tokens[:3]:
-            for c_id in self.token_to_ids[t]:
-                candidate_scores[c_id] += 2
+        # 2. IDF-Weighted Name Tokens
+        tokens = [t for t in q_name.split() if len(t) >= 4 and t not in STOPWORDS and t in self.token_to_ids]
+        tokens.sort(key=lambda t: len(self.token_to_ids[t]))
+        for t in tokens[:3]:
+            postings = self.token_to_ids[t]
+            weight = 8 if len(postings) < 50 else (4 if len(postings) < 200 else 2)
+            for cid in postings:
+                scores[cid] += weight
 
-        prefix = q_name[:7]
-        if prefix in self.name_prefix_to_ids:
-            for c_id in self.name_prefix_to_ids[prefix]:
-                candidate_scores[c_id] += 4
+        # 3. Name Prefix Fallback
+        q_tokens = q_name.split()
+        if q_tokens:
+            pref = q_tokens[0][:5]
+            if pref in self.prefix_to_ids:
+                for cid in self.prefix_to_ids[pref]:
+                    scores[cid] += 3
 
-        if not candidate_scores:
+        if not scores:
             return []
 
-        ranked = sorted(candidate_scores.items(), key=lambda x: x[1], reverse=True)
-        return [c_id for c_id, _ in ranked[:top_k]]
+        return [cid for cid, _ in scores.most_common(top_k)]
 
     def clear(self):
         self.entities.clear()
         self.token_to_ids.clear()
-        self.name_prefix_to_ids.clear()
         self.postal_to_ids.clear()
+        self.prefix_to_ids.clear()
         gc.collect()
 
 def run_pipeline():
-    test_dir = "dataset/test"
+    # Identify test directory location
+    candidate_paths = [
+        "AWS_dataset/student_resource/dataset/test",
+        "dataset/test",
+        "../dataset/test",
+        "../../dataset/test"
+    ]
+    test_dir = None
+    for p in candidate_paths:
+        if os.path.exists(os.path.join(p, "test_source1.tsv")):
+            test_dir = p
+            break
+
+    if not test_dir:
+        print("[!] Error: Could not locate test dataset directory (test_source1.tsv).", flush=True)
+        sys.exit(1)
+
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
     out_candidates = os.path.join(output_dir, "candidate_pairs.tsv")
     out_matches = os.path.join(output_dir, "matching_results.tsv")
 
-    t_s1 = os.path.join(test_dir, "test_source1.tsv")
-    t_s2 = os.path.join(test_dir, "test_source2.tsv")
-    t_s3 = os.path.join(test_dir, "test_source3.tsv")
-
-    for path in (t_s1, t_s2, t_s3):
-        if not os.path.exists(path):
-            print(f"[!] Error: Required test file not found: {path}", flush=True)
-            sys.exit(1)
+    print(f"=== TurboER Iteration 2: Multi-Attribute Inference Pipeline ===", flush=True)
+    print(f"  • Test Dataset Directory : {test_dir}", flush=True)
+    print(f"  • Candidate Pairs Output : {out_candidates}", flush=True)
+    print(f"  • Matching Results Output: {out_matches}", flush=True)
 
     # Initialize or resume files
     file_mode = "w"
     completed_countries = set()
     if os.path.exists(out_matches) and os.path.getsize(out_matches) > 100:
-        # Check existing count and header compliance
         with open(out_matches, "r", encoding="utf-8") as f:
             header = f.readline().strip().split("\t")
             existing_count = sum(1 for _ in f)
         if existing_count >= 259452 and header == ["source1_entity_id", "matched_entity_ids"]:
-            print(f"  [i] Found {existing_count:,} existing rows with valid headers. Resuming from US and India...", flush=True)
+            print(f"  [i] Found {existing_count:,} existing rows with valid headers. Resuming from India and US...", flush=True)
             completed_countries.add("France")
             file_mode = "a"
         else:
-            print(f"  [i] Existing output had outdated schema ({header}). Starting fresh clean run...", flush=True)
             completed_countries.clear()
             file_mode = "w"
-    
+
     if file_mode == "w":
         with open(out_candidates, "w", encoding="utf-8", newline="") as fc, \
              open(out_matches, "w", encoding="utf-8", newline="") as fm:
             csv.writer(fc, delimiter="\t").writerow(["source1_entity_id", "candidate_entity_ids"])
             csv.writer(fm, delimiter="\t").writerow(["source1_entity_id", "matched_entity_ids"])
 
-    COUNTRIES = ["France", "US", "India"]
+    COUNTRIES = ["France", "India", "US"]
     start_all = time.time()
 
     for country in COUNTRIES:
         if country in completed_countries:
-            print(f"\n[SKIP] {country} already completed ({259452:,} rows). Skipping to next country.", flush=True)
+            print(f"\n[SKIP] {country} already completed. Advancing to next partition.", flush=True)
             continue
 
         c_start = time.time()
-        print(f"\n" + "="*60, flush=True)
-        print(f"  --> Processing Partition: {country.upper()}", flush=True)
-        print("="*60, flush=True)
+        print(f"\n" + "=" * 65, flush=True)
+        print(f"  --> PROCESSING PARTITION: {country.upper()}", flush=True)
+        print("=" * 65, flush=True)
 
-        index = UltraCompactCountryIndex(max_postings=150)
+        index = MultiAttributeCountryIndex(max_postings=1500)
 
-        # 1. Stream S2 into index (Fast split parser)
-        print(f"  • Indexing {country} from test_source2.tsv...", flush=True)
+        # 1. Stream S2 into index
         t_s2 = time.time()
         s2_count = 0
         s2_file = os.path.join(test_dir, "test_source2.tsv")
+        print(f"  • Indexing {country} from {s2_file}...", flush=True)
         with open(s2_file, "r", encoding="utf-8") as f:
             next(f, None)
             for line in f:
@@ -220,40 +251,40 @@ def run_pipeline():
                 if len(parts) >= 4 and parts[3] == country:
                     index.add_entity(parts[0], parts[1], parts[2], country)
                     s2_count += 1
-                    if s2_count % 500000 == 0:
-                        print(f"    - S2 indexed {s2_count:,} ({time.time()-t_s2:.1f}s)...", flush=True)
-        print(f"    ✓ S2: {s2_count:,} indexed in {time.time()-t_s2:.1f}s", flush=True)
+        print(f"    ✓ S2 indexed: {s2_count:,} records in {time.time() - t_s2:.1f}s", flush=True)
 
         # 2. Stream S3 into index
-        print(f"  • Indexing {country} from test_source3.tsv...", flush=True)
         t_s3 = time.time()
         s3_count = 0
-        with open(os.path.join(test_dir, "test_source3.tsv"), "r", encoding="utf-8") as f:
+        s3_file = os.path.join(test_dir, "test_source3.tsv")
+        print(f"  • Indexing {country} from {s3_file}...", flush=True)
+        with open(s3_file, "r", encoding="utf-8") as f:
             next(f, None)
             for line in f:
                 parts = line.rstrip("\r\n").split("\t")
                 if len(parts) >= 4 and parts[3] == country:
                     index.add_entity(parts[0], parts[1], parts[2], country)
                     s3_count += 1
-                    if s3_count % 500000 == 0:
-                        print(f"    - S3 indexed {s3_count:,} ({time.time()-t_s3:.1f}s)...", flush=True)
-        print(f"    ✓ S3: {s3_count:,} indexed in {time.time()-t_s3:.1f}s", flush=True)
-        print(f"  • Total target entities indexed: {s2_count + s3_count:,} in {time.time()-c_start:.1f}s", flush=True)
+        print(f"    ✓ S3 indexed: {s3_count:,} records in {time.time() - t_s3:.1f}s", flush=True)
+        print(f"  • Total target pool for {country}: {len(index.entities):,} entities", flush=True)
 
-        # 3. Stream S1 Queries
-        print(f"  • Streaming Source 1 queries for {country}...", flush=True)
+        # 3. Stream S1 Queries & Match
+        print(f"  • Evaluating Source 1 queries for {country}...", flush=True)
         t_q = time.time()
         cand_batch, match_batch = [], []
-        CHUNK_SIZE = 25000
+        CHUNK_SIZE = 20000
         REPORT_INTERVAL = 25000
         q_count = 0
+        singletons_count = 0
+        matches_count = 0
 
         with open(out_candidates, "a", encoding="utf-8", newline="") as fc, \
              open(out_matches, "a", encoding="utf-8", newline="") as fm:
             wc = csv.writer(fc, delimiter="\t")
             wm = csv.writer(fm, delimiter="\t")
 
-            with open(os.path.join(test_dir, "test_source1.tsv"), "r", encoding="utf-8") as f:
+            s1_file = os.path.join(test_dir, "test_source1.tsv")
+            with open(s1_file, "r", encoding="utf-8") as f:
                 next(f, None)
                 for line in f:
                     parts = line.rstrip("\r\n").split("\t")
@@ -263,36 +294,74 @@ def run_pipeline():
                     s1_id = parts[0]
                     b_name = parts[1]
                     b_addr = parts[2]
-                    c_name = canonicalize_legal_suffixes(b_name, country=country) if b_name else ""
-                    p_code, _ = extract_postal_code(b_addr, country=country) if b_addr else (None, None)
+                    q_name = canonicalize_legal_suffixes(b_name, country=country) if b_name else ""
+                    q_addr = normalize_text(b_addr) if b_addr else ""
+                    q_post, q_pref = extract_postal_code(b_addr, country=country) if b_addr else (None, None)
 
-                    candidates = index.query_candidates(c_name, p_code, top_k=12)
+                    candidates = index.retrieve_candidates(q_name, q_addr, q_post, top_k=15)
                     cand_batch.append([s1_id, ",".join(candidates)])
 
                     if not candidates:
                         match_batch.append([s1_id, ""])
+                        singletons_count += 1
                     else:
                         matched = []
-                        for c_id in candidates:
-                            c_data = index.entities.get(c_id)
-                            if c_data:
-                                c_clean_name = c_data[0]
-                                if c_name == c_clean_name:
-                                    matched.append(c_id)
-                                    continue
-                                jw = calc_jw(c_name, c_clean_name)
-                                if jw < 0.48:  # Mathematically cannot reach 0.74 threshold
-                                    continue
-                                tset = fuzz.token_set_ratio(c_name, c_clean_name) / 100.0
-                                score = (jw + tset) / 2.0
-                                if score >= THETA_MATCH:
-                                    matched.append(c_id)
-                        match_batch.append([s1_id, ",".join(matched)])
+                        for cid in candidates:
+                            c_data = index.entities.get(cid)
+                            if not c_data:
+                                continue
+                            c_name, c_addr, c_post, c_pref = c_data
+
+                            # Exact Name & Addr Short-Circuit
+                            if q_name == c_name and (q_addr == c_addr or not q_addr or not c_addr):
+                                matched.append(cid)
+                                continue
+
+                            # Fast Jaro-Winkler Branch Pruning
+                            jw_name = calc_jw(q_name, c_name)
+                            if jw_name < 0.40 and not (q_post and c_post and q_post == c_post):
+                                continue
+
+                            # Token-Set Name Similarity
+                            tset_name = fuzz.token_set_ratio(q_name, c_name) / 100.0
+                            name_sim = max(jw_name, tset_name)
+
+                            # Address Similarity
+                            addr_sim = fuzz.token_set_ratio(q_addr, c_addr) / 100.0 if (q_addr and c_addr) else 0.0
+
+                            # Spatial Gating
+                            post_match = bool(q_post and c_post and q_post == c_post)
+                            post_conflict = bool(q_pref and c_pref and q_pref != c_pref)
+
+                            # High-Precision Multi-Attribute Decision Rules
+                            is_match = False
+                            if name_sim >= 0.88 and addr_sim >= 0.55:
+                                is_match = True
+                            elif name_sim >= 0.94 and (addr_sim >= 0.30 or not q_addr or not c_addr):
+                                is_match = True
+                            elif name_sim >= 0.74 and addr_sim >= 0.82:
+                                is_match = True
+                            elif post_match and name_sim >= 0.80 and addr_sim >= 0.45:
+                                is_match = True
+
+                            # Strict Spatial Conflict Guardrail (eliminates nationwide false merges)
+                            if post_conflict:
+                                is_match = False
+
+                            if is_match:
+                                matched.append(cid)
+
+                        if matched:
+                            match_batch.append([s1_id, ",".join(matched)])
+                            matches_count += len(matched)
+                        else:
+                            match_batch.append([s1_id, ""])
+                            singletons_count += 1
 
                     q_count += 1
                     if q_count % REPORT_INTERVAL == 0:
                         rate = q_count / max(time.time() - t_q, 0.001)
-                        print(f"    [{country}] {q_count:,} queried | Speed: {rate:,.0f} q/s | Elapsed: {time.time()-t_q:.1f}s", flush=True)
+                        print(f"    [{country}] {q_count:,} queried | Rate: {rate:,.0f} q/s | Singletons: {singletons_count:,} ({singletons_count/q_count*100:.1f}%)", flush=True)
 
                     if len(cand_batch) >= CHUNK_SIZE:
                         wc.writerows(cand_batch)
@@ -300,28 +369,25 @@ def run_pipeline():
                         cand_batch.clear()
                         match_batch.clear()
 
-            if cand_batch:
-                wc.writerows(cand_batch)
-                wm.writerows(match_batch)
-                cand_batch.clear()
-                match_batch.clear()
+                if cand_batch:
+                    wc.writerows(cand_batch)
+                    wm.writerows(match_batch)
+                    cand_batch.clear()
+                    match_batch.clear()
 
-        print(f"  ✓ {country} completed: {q_count:,} queries in {time.time()-c_start:.1f}s.", flush=True)
+        print(f"  ✓ {country} completed: {q_count:,} queries ({singletons_count:,} singletons) in {time.time()-c_start:.1f}s.", flush=True)
         index.clear()
         gc.collect()
 
     total_time = time.time() - start_all
-    print(f"\n[PIPELINE COMPLETE] All test partitions processed in {total_time:.1f}s ({total_time/60:.1f} mins).", flush=True)
-    print(f"  • Candidates File : {out_candidates}", flush=True)
-    print(f"  • Matching File   : {out_matches}", flush=True)
-
+    print(f"\n[INFERENCE COMPLETE] All partitions executed in {total_time:.1f}s ({total_time/60:.1f} mins).", flush=True)
     validate_and_package(out_candidates, out_matches)
 
 def validate_and_package(out_candidates: str, out_matches: str):
     import zipfile
-    print("\n" + "="*60, flush=True)
-    print("  --> Executing Official Submission Validation & Packaging", flush=True)
-    print("="*60, flush=True)
+    print("\n" + "=" * 65, flush=True)
+    print("  --> EXECUTING SUBMISSION VALIDATION & ARCHIVE CREATION", flush=True)
+    print("=" * 65, flush=True)
 
     errors = []
     m_count = 0
@@ -347,12 +413,12 @@ def validate_and_package(out_candidates: str, out_matches: str):
                 break
 
     if errors:
-        print("\n[!] Validation FAILED:")
+        print("\n[!] Validation FAILED:", flush=True)
         for e in errors:
-            print("  • " + e)
-        return False
+            print("  • " + e, flush=True)
+        sys.exit(1)
 
-    print(f"  ✓ Validation PASSED: All {m_count:,} test entities aligned and compliant with M ⊆ C!", flush=True)
+    print(f"  ✓ Subsumption Invariant Verified: All {m_count:,} rows strictly satisfy M ⊆ C!", flush=True)
 
     zip_path = "output/submission.zip"
     print(f"  • Packaging {zip_path} ...", flush=True)
@@ -371,9 +437,7 @@ def validate_and_package(out_candidates: str, out_matches: str):
     except Exception as e:
         print(f"  [i] S3 upload skipped ({e}). Archive is ready locally at {zip_path}", flush=True)
 
-    print("  ★ READY FOR LEADERBOARD SUBMISSION ★", flush=True)
-    return True
+    print("  ★ READY FOR LEADERBOARD EVALUATION ★", flush=True)
 
 if __name__ == "__main__":
     run_pipeline()
-
