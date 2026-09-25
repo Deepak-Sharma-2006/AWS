@@ -417,5 +417,29 @@ npm run token:models                          # Lists all supported Antigravity 
 npm run token:budget                          # Displays token budget usage and saturation directives
 ```
 
+---
+
+## 12. Amazon ML Challenge 2026 & Unstop Submission Commands
+
+Production ML pipeline commands for large-scale Business Entity Resolution (1.73M entities) and Unstop platform browser submission automation.
+
+```bash
+# 1. Execute Full Test Inference (Entity Resolution across 1.73M test records)
+python scripts/run_test_inference.py
+# Generates matching_results.tsv (154.48 MB, 1,732,544 rows, TSV format)
+
+# 2. Verify Output TSV Format & Schema Compliance
+python scripts/verify_matching_tsv_format.py
+# Asserts: 1,732,544 rows, correct tab delimiter, non-empty matches, candidate subset invariant
+
+# 3. Execute Official Amazon ML Challenge Validation Suite
+python AWS_dataset/student_resource/utils/validate_submission.py
+# Asserts: Official competition rules, duplicate checks, format correctness (PASS status)
+
+# 4. Unstop Browser Submission Hotfix (Bypasses Windows TSV empty MIME type & Angular crash)
+# Source file: scripts/unstop_submission_hotfix.js
+# Usage: Paste into browser DevTools Console (F12) on https://unstop.com/.../play/code
+```
+
 
 

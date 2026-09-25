@@ -80,4 +80,7 @@ docs/plans/*_casec_test_*.md
 
 # Large Competition Datasets (> 100MB rejected by GitHub)
 AWS_dataset/
+matching_results.tsv
+candidate_pairs.tsv
+scratch/
 
